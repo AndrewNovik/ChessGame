@@ -1,0 +1,18 @@
+<div class="chess-board">
+  <div *ngFor="let row of chessBoardView; let x = index" class="row">
+    <div
+      *ngFor="let cell of row; let y = index"
+      class="square"
+      [ngClass]="isCellDark(x, y) ? 'dark' : 'light'"
+    >
+      <div>
+        <img
+          *ngIf="cell"
+          [src]="figureImageSource[cell]"
+          [alt]="cell"
+          class="piece"
+        />
+      </div>
+    </div>
+  </div>
+</div>
