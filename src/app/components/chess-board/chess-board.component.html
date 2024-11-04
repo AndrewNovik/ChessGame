@@ -1,18 +1,24 @@
+<h1>svdnmsdklvnm</h1>
+
 <div class="chess-board">
   <div *ngFor="let row of chessBoardView; let x = index" class="row">
     <div
       *ngFor="let cell of row; let y = index"
       class="square"
-      [ngClass]="isCellDark(x, y) ? 'dark' : 'light'"
+      [ngClass]="{
+        'selected-cell': isCellSelected(x, y),
+        'dark-cell': isCellDark(x, y),
+        'light-cell': !isCellDark(x, y)
+      }"
+      (click)="selectCell(x, y)"
     >
-      <div>
-        <img
-          *ngIf="cell"
-          [src]="figureImageSource[cell]"
-          [alt]="cell"
-          class="piece"
-        />
-      </div>
+      <div [ngClass]="{ 'safe-cell': isCellSafeForSelectedFigure(x, y) }"></div>
+      <img
+        *ngIf="cell"
+        [src]="figureImageSource[cell]"
+        [alt]="cell"
+        class="piece"
+      />
     </div>
   </div>
 </div>

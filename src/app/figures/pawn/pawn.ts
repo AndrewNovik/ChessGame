@@ -1,8 +1,4 @@
-import {
-  Figure,
-  Coordinate,
-  PiecesColor,
-} from '../../interfaces/figures.interface';
+import { Figure, Coordinate, Color } from '../../interfaces/figures.interface';
 import { FigurePiece } from '../figures';
 
 export class Pawn extends FigurePiece {
@@ -15,11 +11,11 @@ export class Pawn extends FigurePiece {
     { x: 1, y: -1 },
   ];
 
-  constructor(private pieceColor: PiecesColor) {
+  constructor(private pieceColor: Color) {
     super(pieceColor);
-    if (pieceColor === PiecesColor.Black) this.setBlackPawnCoordinates();
+    if (pieceColor === Color.Black) this.setBlackPawnCoordinates();
     this._Figure =
-      pieceColor === PiecesColor.White ? Figure.WhitePawn : Figure.BlackPawn;
+      pieceColor === Color.White ? Figure.WhitePawn : Figure.BlackPawn;
   }
 
   private setBlackPawnCoordinates(): void {
@@ -37,6 +33,6 @@ export class Pawn extends FigurePiece {
       { x: 1, y: 1 },
       { x: 1, y: -1 },
     ];
-    if (this.pieceColor === PiecesColor.Black) this.setBlackPawnCoordinates();
+    if (this.pieceColor === Color.Black) this.setBlackPawnCoordinates();
   }
 }

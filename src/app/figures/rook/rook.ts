@@ -1,8 +1,4 @@
-import {
-  Figure,
-  Coordinate,
-  PiecesColor,
-} from '../../interfaces/figures.interface';
+import { Figure, Coordinate, Color } from '../../interfaces/figures.interface';
 import { FigurePiece } from '../figures';
 
 export class Rook extends FigurePiece {
@@ -15,10 +11,10 @@ export class Rook extends FigurePiece {
     { x: 0, y: -1 },
   ];
 
-  constructor(private pieceColor: PiecesColor) {
+  constructor(private pieceColor: Color) {
     super(pieceColor);
     this._Figure =
-      pieceColor === PiecesColor.White ? Figure.WhiteRook : Figure.BlackRook;
+      pieceColor === Color.White ? Figure.WhiteRook : Figure.BlackRook;
   }
 
   public get hasMoved(): boolean {

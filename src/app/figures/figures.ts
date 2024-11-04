@@ -1,14 +1,10 @@
-import {
-  Coordinate,
-  Figure,
-  PiecesColor,
-} from '../interfaces/figures.interface';
+import { Coordinate, Figure, Color } from '../interfaces/figures.interface';
 
 export abstract class FigurePiece {
   protected abstract _Figure: Figure;
   protected abstract _coordinates: Coordinate[]; // available mooves ?
 
-  constructor(private _color: PiecesColor) {}
+  constructor(private _color: Color) {}
 
   get figure(): Figure {
     return this._Figure;
@@ -18,7 +14,7 @@ export abstract class FigurePiece {
     return this._coordinates;
   }
 
-  get color(): PiecesColor {
+  get color(): Color {
     return this._color;
   }
 }

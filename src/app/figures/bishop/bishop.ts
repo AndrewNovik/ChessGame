@@ -1,8 +1,4 @@
-import {
-  Figure,
-  Coordinate,
-  PiecesColor,
-} from '../../interfaces/figures.interface';
+import { Figure, Coordinate, Color } from '../../interfaces/figures.interface';
 import { FigurePiece } from '../figures';
 
 export class Bishop extends FigurePiece {
@@ -14,11 +10,9 @@ export class Bishop extends FigurePiece {
     { x: -1, y: -1 },
   ];
 
-  constructor(private pieceColor: PiecesColor) {
+  constructor(private pieceColor: Color) {
     super(pieceColor);
     this._Figure =
-      pieceColor === PiecesColor.White
-        ? Figure.WhiteBishop
-        : Figure.BlackBishop;
+      pieceColor === Color.White ? Figure.WhiteBishop : Figure.BlackBishop;
   }
 }

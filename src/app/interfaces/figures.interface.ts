@@ -14,19 +14,26 @@ export enum Figure {
   BlackKing = 'BK',
 }
 
-export enum PiecesColor {
-  White,
-  Black,
-}
-
 export enum Color {
-  White,
-  Black,
+  White = 'White',
+  Black = 'Black',
 }
 
 export type Coordinate = {
   x: number;
   y: number;
+};
+
+export type SelectedCell = CellWithFigure | CellWithOutFigure;
+
+type CellWithFigure = {
+  figure: Figure;
+  x: number;
+  y: number;
+};
+
+type CellWithOutFigure = {
+  figure: null;
 };
 
 export const FigureImageSource: Readonly<Record<Figure, string>> = {
@@ -43,3 +50,5 @@ export const FigureImageSource: Readonly<Record<Figure, string>> = {
   [Figure.BlackQueen]: 'assets/images/png/bq.png',
   [Figure.BlackKing]: 'assets/images/png/bk.png',
 };
+
+export type SafeMoves = Map<string, Coordinate[]>;

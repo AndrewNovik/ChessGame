@@ -1,8 +1,4 @@
-import {
-  Figure,
-  Coordinate,
-  PiecesColor,
-} from '../../interfaces/figures.interface';
+import { Figure, Coordinate, Color } from '../../interfaces/figures.interface';
 import { FigurePiece } from '../figures';
 
 export class King extends FigurePiece {
@@ -13,16 +9,16 @@ export class King extends FigurePiece {
     { x: 0, y: -1 },
     { x: 1, y: 0 },
     { x: 1, y: -1 },
-    { x: 1, y: -1 },
+    { x: 1, y: 1 },
     { x: -1, y: 0 },
     { x: -1, y: 1 },
     { x: -1, y: -1 },
   ];
 
-  constructor(private pieceColor: PiecesColor) {
+  constructor(private pieceColor: Color) {
     super(pieceColor);
     this._Figure =
-      pieceColor === PiecesColor.White ? Figure.WhiteKing : Figure.BlackKing;
+      pieceColor === Color.White ? Figure.WhiteKing : Figure.BlackKing;
   }
 
   public get hasMoved(): boolean {

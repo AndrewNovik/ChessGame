@@ -1,8 +1,4 @@
-import {
-  Figure,
-  Coordinate,
-  PiecesColor,
-} from '../../interfaces/figures.interface';
+import { Figure, Coordinate, Color } from '../../interfaces/figures.interface';
 import { FigurePiece } from '../figures';
 
 export class Knight extends FigurePiece {
@@ -18,11 +14,9 @@ export class Knight extends FigurePiece {
     { x: -2, y: -1 },
   ];
 
-  constructor(private pieceColor: PiecesColor) {
+  constructor(private pieceColor: Color) {
     super(pieceColor);
     this._Figure =
-      pieceColor === PiecesColor.White
-        ? Figure.WhiteKnight
-        : Figure.BlackKnight;
+      pieceColor === Color.White ? Figure.WhiteKnight : Figure.BlackKnight;
   }
 }
