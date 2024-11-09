@@ -10,6 +10,7 @@ import {
 } from '../../interfaces/figures.interface';
 import { CommonModule } from '@angular/common';
 import { FigurePiece } from '../../figures/figures';
+import { isEquel } from '../../utils/helpers';
 
 @Component({
   selector: 'app-chess-board',
@@ -55,46 +56,43 @@ export class ChessBoardComponent {
     );
   }
 
-  selectCell(x: number, y: number): void {
-    const figurePiece: FigurePiece | null =
-      this.chessBoard.chessBoardFigures[x][y];
+  move(x: number, y: number): void {
     const figure: Figure | null = this.chessBoardView[x][y];
-    if (
-      JSON.stringify(this.selectedCell) === JSON.stringify({ figure, x, y })
-    ) {
+    if (isEquel(this.selectedCell, { figure, x, y })) {
+      // удаляем выбранную фигуру и ее возможные ходы,
+      // если до этого ее выбрали  выходим из функции.
       this.selectedCell = { figure: null };
       this.figureSafeCells = [];
       return;
+    } else if (
+      this.selectedCell.figure &&
+      this.isCellSafeForSelectedFigure(x, y)
+    ) {
+      // в противном случае, если уже была выбрана фигура
+      // и мы выбрали возможный для нее ход,
+      // перемещаем ее и просто выходим из функции.
+      this.replaceFigure(x, y);
+      return;
     }
-
-    if (!figure) return;
-
-    if (this.isEnemyFigureSelected(figurePiece)) return;
-
+    // если проверки выше не прошли, значит мы первый раз выбрали фигуру,
+    // значит засетим ей ячейку и возможные доступные ходы.
     this.selectedCell = { figure, x, y };
     this.figureSafeCells = this.safeCells.get(x + ',' + y) || [];
   }
 
   public replaceFigure(newX: number, newY: number): void {
-    if (!this.selectedCell.figure) return;
-
-    if (!this.isCellSafeForSelectedFigure(newX, newY)) return;
-
-    const { x: prevX, y: prevY } = this.selectedCell;
-
-    this.chessBoard.moveFigure(prevX, prevY, newX, newY);
+    this.chessBoard.moveFigure(
+      this.selectedCell.x!,
+      this.selectedCell.y!,
+      newX,
+      newY
+    );
     this.chessBoardView = this.chessBoard.chessBoardView;
     this.figureSafeCells = [];
+    this.selectedCell = { figure: null };
   }
 
-  public move(x: number, y: number): void {
-    this.selectCell(x, y);
-    this.replaceFigure(x, y);
-  }
-
-  private isEnemyFigureSelected(figure: FigurePiece | null): boolean {
-    const isWhiteFigureSelected: boolean = figure?.color === this.playerColor;
-
-    return !isWhiteFigureSelected;
-  }
+  // private isEnemyFigureSelected(figure: FigurePiece | null): boolean {
+  //   return figure?.color === this.playerColor ? false : true;
+  // }
 }
