@@ -34,6 +34,8 @@ type CellWithFigure = {
 
 type CellWithOutFigure = {
   figure: null;
+  x?: number;
+  y?: number;
 };
 
 export const FigureImageSource: Readonly<Record<Figure, string>> = {

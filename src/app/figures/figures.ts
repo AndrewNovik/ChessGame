@@ -2,7 +2,7 @@ import { Coordinate, Figure, Color } from '../interfaces/figures.interface';
 
 export abstract class FigurePiece {
   protected abstract _Figure: Figure;
-  protected abstract _coordinates: Coordinate[]; // available mooves ?
+  protected abstract _coordinates: Coordinate[];
 
   constructor(private _color: Color) {}
 

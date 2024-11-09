@@ -17,7 +17,7 @@ export class ChessBoard {
   private chessBoard: (FigurePiece | null)[][];
   private _playerColor = Color.White;
   private readonly chessBoardSize: number = 8;
-  private _safeCells: SafeMoves = new Map();
+  private _safeCells: SafeMoves;
 
   constructor() {
     this.chessBoard = [
@@ -35,34 +35,16 @@ export class ChessBoard {
         new Pawn(Color.White),
         new Pawn(Color.White),
         new Pawn(Color.White),
-        null,
+        new Pawn(Color.White),
         new Pawn(Color.White),
         new Pawn(Color.White),
         new Pawn(Color.White),
         new Pawn(Color.White),
       ],
-      [
-        new Knight(Color.White),
-        new Knight(Color.White),
-        null,
-        null,
-        null,
-        null,
-        null,
-        new Knight(Color.White),
-      ],
-      [null, null, null, new Bishop(Color.White), null, null, null, null],
-      [
-        null,
-        new Queen(Color.White),
-        null,
-        null,
-        new Rook(Color.White),
-        null,
-        new King(Color.White),
-        null,
-      ],
-      [null, null, null, new Bishop(Color.White), null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
+      [null, null, null, null, null, null, null, null],
       [
         new Pawn(Color.Black),
         new Pawn(Color.Black),
@@ -100,6 +82,11 @@ export class ChessBoard {
       return row.map((piece) =>
         piece instanceof FigurePiece ? piece.figure : null
       );
+    });
+  }
+  public get chessBoardFigures(): (FigurePiece | null)[][] {
+    return this.chessBoard.map((row) => {
+      return row.map((cell) => (cell?.figure ? cell : null));
     });
   }
   public static isCellDark(x: number, y: number): boolean {
@@ -246,10 +233,48 @@ export class ChessBoard {
         }
 
         if (figureSafeMoves.length) {
-          safeMoves.set(`${x},${y}`, figureSafeMoves);
+          safeMoves.set(x + ',' + y, figureSafeMoves);
         }
       }
     }
     return safeMoves;
+  }
+
+  public moveFigure(prevX: number, prevY: number, newX: number, newY: number) {
+    if (!this.areCoordsValid(prevX, prevY) || !this.areCoordsValid(newX, newY))
+      return;
+
+    const piece: FigurePiece | null = this.chessBoardFigures[prevX][prevY];
+
+    if (!piece || piece.color !== this._playerColor) return;
+
+    const figureSafeMoves: Coordinate[] | undefined = this._safeCells.get(
+      prevX + ',' + prevY
+    );
+
+    if (
+      !figureSafeMoves ||
+      !figureSafeMoves.find(
+        (coordinate) => coordinate.x === newX && coordinate.y === newY
+      )
+    ) {
+      throw new Error('Square is not safe');
+    }
+
+    if (
+      piece instanceof Pawn ||
+      piece instanceof King ||
+      (piece instanceof Rook && !piece.hasMoved)
+    ) {
+      piece.hasMoved = true;
+    }
+
+    this.chessBoard[prevX][prevY] = null;
+    this.chessBoard[newX][newY] = piece;
+
+    this._playerColor =
+      this._playerColor === Color.White ? Color.Black : Color.White;
+
+    this._safeCells = this.findSafeMoves();
   }
 }

@@ -1,8 +1,7 @@
-<h1>svdnmsdklvnm</h1>
-
 <div class="chess-board">
   <div *ngFor="let row of chessBoardView; let x = index" class="row">
     <div
+      style="position: relative"
       *ngFor="let cell of row; let y = index"
       class="square"
       [ngClass]="{
@@ -10,9 +9,12 @@
         'dark-cell': isCellDark(x, y),
         'light-cell': !isCellDark(x, y)
       }"
-      (click)="selectCell(x, y)"
+      (click)="move(x, y)"
     >
       <div [ngClass]="{ 'safe-cell': isCellSafeForSelectedFigure(x, y) }"></div>
+      <small style="position: absolute; bottom: 0; left: 0"
+        >{{ x }},{{ y }}</small
+      >
       <img
         *ngIf="cell"
         [src]="figureImageSource[cell]"
