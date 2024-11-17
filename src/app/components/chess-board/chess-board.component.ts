@@ -5,11 +5,12 @@ import {
   Coordinate,
   Figure,
   FigureImageSource,
+  KingChecking,
+  PrevMove,
   SafeMoves,
   SelectedCell,
 } from '../../interfaces/figures.interface';
 import { CommonModule } from '@angular/common';
-import { FigurePiece } from '../../figures/figures';
 import { isEquel } from '../../utils/helpers';
 
 @Component({
@@ -25,12 +26,17 @@ export class ChessBoardComponent {
   private figureSafeCells: Coordinate[];
   public figureImageSource = FigureImageSource;
   public chessBoardView: (Figure | null)[][];
+  public lastMove: PrevMove | undefined;
+  public recordedMoves: PrevMove[];
+  private checkState: KingChecking;
 
   constructor() {
     this.chessBoard = new ChessBoard();
     this.chessBoardView = this.chessBoard.chessBoardView;
     this.selectedCell = { figure: null };
     this.figureSafeCells = [];
+    this.recordedMoves = [];
+    this.checkState = this.chessBoard.checkingKing;
   }
 
   get playerColor(): Color {
@@ -39,8 +45,6 @@ export class ChessBoardComponent {
   get safeCells(): SafeMoves {
     return this.chessBoard.safeCells;
   }
-
-  ngOnInit() {}
 
   isCellDark(x: number, y: number): boolean {
     return ChessBoard.isCellDark(x, y);
@@ -56,11 +60,25 @@ export class ChessBoardComponent {
     );
   }
 
+  isCellPrevMove(x: number, y: number): boolean {
+    if (!this.lastMove) return false;
+    const { prevX, prevY, currX, currY } = this.lastMove;
+    return (x === prevX && y === prevY) || (x === currX && y === currY);
+  }
+
+  isKingChecked(x: number, y: number): boolean {
+    return (
+      this.checkState.isInCheck &&
+      this.checkState.x === x &&
+      this.checkState.y === y
+    );
+  }
+
   move(x: number, y: number): void {
     const figure: Figure | null = this.chessBoardView[x][y];
     if (isEquel(this.selectedCell, { figure, x, y })) {
       // удаляем выбранную фигуру и ее возможные ходы,
-      // если до этого ее выбрали  выходим из функции.
+      // если до этого ее выбрали и выходим из функции.
       this.selectedCell = { figure: null };
       this.figureSafeCells = [];
       return;
@@ -81,6 +99,15 @@ export class ChessBoardComponent {
   }
 
   public replaceFigure(newX: number, newY: number): void {
+    // помечаем предыдущий ход
+    this.lastMove = {
+      color: this.playerColor,
+      prevX: this.selectedCell.x!,
+      prevY: this.selectedCell.y!,
+      currX: newX,
+      currY: newY,
+    };
+    this.recordedMoves.push(this.lastMove);
     this.chessBoard.moveFigure(
       this.selectedCell.x!,
       this.selectedCell.y!,
@@ -88,6 +115,11 @@ export class ChessBoardComponent {
       newY
     );
     this.chessBoardView = this.chessBoard.chessBoardView;
+    this.checkState = this.chessBoard.checkingKing;
+    this.unmarkingSelectionAndSafeMoves();
+  }
+
+  private unmarkingSelectionAndSafeMoves(): void {
     this.figureSafeCells = [];
     this.selectedCell = { figure: null };
   }

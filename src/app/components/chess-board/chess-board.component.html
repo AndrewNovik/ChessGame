@@ -7,7 +7,9 @@
       [ngClass]="{
         'selected-cell': isCellSelected(x, y),
         'dark-cell': isCellDark(x, y),
-        'light-cell': !isCellDark(x, y)
+        'light-cell': !isCellDark(x, y),
+        'last-move': isCellPrevMove(x, y),
+        'king-in-check': isKingChecked(x, y)
       }"
       (click)="move(x, y)"
     >
@@ -26,5 +28,21 @@
 </div>
 
 <div>
-  <span>Ход - {{ playerColor === "White" ? "Белых" : "Черных" }}</span>
+  <h3>Ход - {{ playerColor === "White" ? "Белых" : "Черных" }}</h3>
+</div>
+
+<div>
+  <h3>История ходов</h3>
+  <div *ngFor="let move of recordedMoves">
+    <span
+      >{{
+        (move.color === "White" ? "W" : "B") +
+          " " +
+          move.prevX +
+          " " +
+          move.prevY
+      }}
+      на {{ move.currX + " " + move.currY }}</span
+    >
+  </div>
 </div>

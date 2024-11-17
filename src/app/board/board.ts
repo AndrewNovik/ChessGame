@@ -10,6 +10,7 @@ import {
   Color,
   Coordinate,
   Figure,
+  KingChecking,
   SafeMoves,
 } from '../interfaces/figures.interface';
 
@@ -18,6 +19,7 @@ export class ChessBoard {
   private _playerColor = Color.White;
   private readonly chessBoardSize: number = 8;
   private _safeCells: SafeMoves;
+  private _checkingKing: KingChecking;
 
   constructor() {
     this.chessBoard = [
@@ -67,6 +69,7 @@ export class ChessBoard {
       ],
     ];
     this._safeCells = this.findSafeMoves();
+    this._checkingKing = { isInCheck: false };
   }
 
   get safeCells() {
@@ -75,6 +78,10 @@ export class ChessBoard {
 
   public get playerColor(): Color {
     return this._playerColor;
+  }
+
+  get checkingKing(): KingChecking {
+    return this._checkingKing;
   }
 
   public get chessBoardView(): (Figure | null)[][] {
@@ -99,7 +106,10 @@ export class ChessBoard {
     );
   }
 
-  public isInCheck(playerFigureColor: Color): boolean {
+  public isInCheck(
+    playerFigureColor: Color,
+    checkCurrPos: boolean = false
+  ): boolean {
     for (let x = 0; x < this.chessBoardSize; x++) {
       for (let y = 0; y < this.chessBoardSize; y++) {
         const figure: FigurePiece | null = this.chessBoard[x][y];
@@ -125,7 +135,11 @@ export class ChessBoard {
               attackedFigure instanceof King &&
               attackedFigure.color == playerFigureColor
             ) {
-              return false;
+              if (checkCurrPos) {
+                this._checkingKing = { isInCheck: true, x: newX, y: newY };
+
+                return true;
+              }
             }
           } else {
             while (this.areCoordsValid(newX, newY)) {
@@ -134,8 +148,13 @@ export class ChessBoard {
               if (
                 attackedFigure instanceof King &&
                 attackedFigure.color === playerFigureColor
-              )
-                return true;
+              ) {
+                if (checkCurrPos) {
+                  this._checkingKing = { isInCheck: true, x: newX, y: newY };
+
+                  return true;
+                }
+              }
 
               if (attackedFigure !== null) break;
 
@@ -146,6 +165,7 @@ export class ChessBoard {
         }
       }
     }
+    if (checkCurrPos) this._checkingKing = { isInCheck: false };
     return false;
   }
 
@@ -274,7 +294,7 @@ export class ChessBoard {
 
     this._playerColor =
       this._playerColor === Color.White ? Color.Black : Color.White;
-
+    this.isInCheck(this._playerColor, true);
     this._safeCells = this.findSafeMoves();
   }
 }

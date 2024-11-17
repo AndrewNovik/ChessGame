@@ -54,3 +54,23 @@ export const FigureImageSource: Readonly<Record<Figure, string>> = {
 };
 
 export type SafeMoves = Map<string, Coordinate[]>;
+
+export type PrevMove = {
+  color: Color;
+  prevX: number;
+  prevY: number;
+  currX: number;
+  currY: number;
+};
+
+type KingChecked = {
+  isInCheck: true;
+  x: number;
+  y: number;
+};
+
+type KingNotChecked = {
+  isInCheck: false;
+};
+
+export type KingChecking = KingChecked | KingNotChecked;
