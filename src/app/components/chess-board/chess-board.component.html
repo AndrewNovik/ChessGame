@@ -1,5 +1,5 @@
 <div class="chess-board">
-  <div *ngFor="let row of chessBoardView; let x = index" class="row">
+  <div *ngFor="let row of chessBoardFigures; let x = index" class="row">
     <div
       style="position: relative"
       *ngFor="let cell of row; let y = index"
@@ -19,8 +19,8 @@
       >
       <img
         *ngIf="cell"
-        [src]="figureImageSource[cell]"
-        [alt]="cell"
+        [src]="figureImageSource[cell.figure]"
+        [alt]="cell.figure"
         class="piece"
       />
     </div>

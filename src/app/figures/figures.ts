@@ -1,8 +1,12 @@
-import { Coordinate, Figure, Color } from '../interfaces/figures.interface';
+import {
+  Figure,
+  Color,
+  FigureDirections,
+} from '../interfaces/figures.interface';
 
 export abstract class FigurePiece {
   protected abstract _Figure: Figure;
-  protected abstract _coordinates: Coordinate[];
+  protected abstract _figureDirections: FigureDirections[];
 
   constructor(private _color: Color) {}
 
@@ -10,11 +14,11 @@ export abstract class FigurePiece {
     return this._Figure;
   }
 
-  get coordinates(): Coordinate[] {
-    return this._coordinates;
-  }
-
   get color(): Color {
     return this._color;
+  }
+
+  get figureDirections(): FigureDirections[] {
+    return this._figureDirections;
   }
 }

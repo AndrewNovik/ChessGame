@@ -1,10 +1,14 @@
-import { Figure, Coordinate, Color } from '../../interfaces/figures.interface';
+import {
+  Figure,
+  Color,
+  FigureDirections,
+} from '../../interfaces/figures.interface';
 import { FigurePiece } from '../figures';
 
 export class Pawn extends FigurePiece {
   private _hasMoved: boolean = false;
   protected override _Figure: Figure;
-  protected override _coordinates: Coordinate[] = [
+  protected override _figureDirections: FigureDirections[] = [
     { x: 1, y: 0 },
     { x: 2, y: 0 },
     { x: 1, y: 1 },
@@ -19,7 +23,10 @@ export class Pawn extends FigurePiece {
   }
 
   private setBlackPawnCoordinates(): void {
-    this._coordinates = this._coordinates.map(({ x, y }) => ({ x: -1 * x, y }));
+    this._figureDirections = this._figureDirections.map(({ x, y }) => ({
+      x: -1 * x,
+      y,
+    }));
   }
 
   public get hasMoved(): boolean {
@@ -28,7 +35,7 @@ export class Pawn extends FigurePiece {
 
   public set hasMoved(_) {
     this._hasMoved = true;
-    this._coordinates = [
+    this._figureDirections = [
       { x: 1, y: 0 },
       { x: 1, y: 1 },
       { x: 1, y: -1 },

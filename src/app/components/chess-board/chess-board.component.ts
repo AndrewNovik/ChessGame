@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { ChessBoard } from '../../board/board';
 import {
+  CellWithFigure,
   Color,
   Coordinate,
-  Figure,
   FigureImageSource,
   KingChecking,
   PrevMove,
@@ -12,6 +12,7 @@ import {
 } from '../../interfaces/figures.interface';
 import { CommonModule } from '@angular/common';
 import { isEquel } from '../../utils/helpers';
+import { FigurePiece } from '../../figures/figures';
 
 @Component({
   selector: 'app-chess-board',
@@ -21,23 +22,17 @@ import { isEquel } from '../../utils/helpers';
   styleUrl: './chess-board.component.scss',
 })
 export class ChessBoardComponent {
-  private chessBoard: ChessBoard;
-  private selectedCell: SelectedCell;
-  private figureSafeCells: Coordinate[];
+  private chessBoard: ChessBoard = new ChessBoard();
+  private selectedCell: SelectedCell = { figure: null };
+  private figureSafeCells: Coordinate[] = [];
   public figureImageSource = FigureImageSource;
-  public chessBoardView: (Figure | null)[][];
+  public chessBoardFigures: (FigurePiece | null)[][] =
+    this.chessBoard.chessBoardFigures;
   public lastMove: PrevMove | undefined;
-  public recordedMoves: PrevMove[];
-  private checkState: KingChecking;
+  public recordedMoves: PrevMove[] = [];
+  private checkState: KingChecking = this.chessBoard.checkingKing;
 
-  constructor() {
-    this.chessBoard = new ChessBoard();
-    this.chessBoardView = this.chessBoard.chessBoardView;
-    this.selectedCell = { figure: null };
-    this.figureSafeCells = [];
-    this.recordedMoves = [];
-    this.checkState = this.chessBoard.checkingKing;
-  }
+  constructor() {}
 
   get playerColor(): Color {
     return this.chessBoard.playerColor;
@@ -75,10 +70,10 @@ export class ChessBoardComponent {
   }
 
   move(x: number, y: number): void {
-    const figure: Figure | null = this.chessBoardView[x][y];
-    if (isEquel(this.selectedCell, { figure, x, y })) {
+    const piece: FigurePiece | null = this.chessBoardFigures[x][y];
+    if (isEquel(this.selectedCell, { figure: piece?.figure || null, x, y })) {
       // удаляем выбранную фигуру и ее возможные ходы,
-      // если до этого ее выбрали и выходим из функции.
+      // если до этого её выбрали и выходим из функции.
       this.selectedCell = { figure: null };
       this.figureSafeCells = [];
       return;
@@ -89,32 +84,41 @@ export class ChessBoardComponent {
       // в противном случае, если уже была выбрана фигура
       // и мы выбрали возможный для нее ход,
       // перемещаем ее и просто выходим из функции.
-      this.replaceFigure(x, y);
+      this.replaceFigure(x, y, this.selectedCell);
       return;
     }
-    // если проверки выше не прошли, значит мы первый раз выбрали фигуру,
-    // значит засетим ей ячейку и возможные доступные ходы.
-    this.selectedCell = { figure, x, y };
-    this.figureSafeCells = this.safeCells.get(x + ',' + y) || [];
+
+    if (piece?.figure) {
+      // если проверки выше не прошли, значит мы первый раз выбрали фигуру(клетку),
+      // значит засетим ей ячейку и возможные доступные ходы, если выбрана клетка.
+      this.selectedCell = { figure: piece.figure, x, y };
+      this.figureSafeCells = this.safeCells.get(x + ',' + y) || [];
+      return;
+    }
+
+    // если ничего выше не произошло, просто сетим выбранную ячейку и обнуляем возможно выбранные ранее мувы
+    this.selectedCell = { figure: null, x, y };
+    this.figureSafeCells = [];
   }
 
-  public replaceFigure(newX: number, newY: number): void {
+  public replaceFigure(
+    newX: number,
+    newY: number,
+    selectedCell: CellWithFigure
+  ): void {
     // помечаем предыдущий ход
     this.lastMove = {
       color: this.playerColor,
-      prevX: this.selectedCell.x!,
-      prevY: this.selectedCell.y!,
+      prevX: selectedCell.x,
+      prevY: selectedCell.y,
       currX: newX,
       currY: newY,
     };
+    // TO DO красивые иконки ходов
     this.recordedMoves.push(this.lastMove);
-    this.chessBoard.moveFigure(
-      this.selectedCell.x!,
-      this.selectedCell.y!,
-      newX,
-      newY
-    );
-    this.chessBoardView = this.chessBoard.chessBoardView;
+
+    this.chessBoard.moveFigure(selectedCell.x, selectedCell.y, newX, newY);
+    this.chessBoardFigures = this.chessBoard.chessBoardFigures;
     this.checkState = this.chessBoard.checkingKing;
     this.unmarkingSelectionAndSafeMoves();
   }

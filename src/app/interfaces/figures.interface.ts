@@ -1,3 +1,5 @@
+import { FigurePiece } from '../figures/figures';
+
 export enum Figure {
   WhitePawn = 'WP',
   WhiteKnight = 'WN',
@@ -24,9 +26,14 @@ export type Coordinate = {
   y: number;
 };
 
+export type FigureDirections = {
+  x: number;
+  y: number;
+};
+
 export type SelectedCell = CellWithFigure | CellWithOutFigure;
 
-type CellWithFigure = {
+export type CellWithFigure = {
   figure: Figure;
   x: number;
   y: number;
