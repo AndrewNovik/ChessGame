@@ -60,6 +60,21 @@ export const FigureImageSource: Readonly<Record<Figure, string>> = {
   [Figure.BlackKing]: 'assets/images/png/bk.png',
 };
 
+export const promotedFigureTypes = {
+  whiteList: [
+    Figure.WhiteKnight,
+    Figure.WhiteBishop,
+    Figure.WhiteRook,
+    Figure.WhiteQueen,
+  ],
+  blaclList: [
+    Figure.BlackKnight,
+    Figure.BlackBishop,
+    Figure.BlackRook,
+    Figure.BlackQueen,
+  ],
+};
+
 export type SafeMoves = Map<string, Coordinate[]>;
 
 export type LastMove = {

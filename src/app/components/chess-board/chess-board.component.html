@@ -9,7 +9,8 @@
         'dark-cell': isCellDark(x, y),
         'light-cell': !isCellDark(x, y),
         'last-move': isCellPrevMove(x, y),
-        'king-in-check': isKingChecked(x, y)
+        'king-in-check': isKingChecked(x, y),
+        'promotion-cell': isCellPromotionCell(x, y)
       }"
       (click)="move(x, y)"
     >
@@ -25,6 +26,18 @@
       />
     </div>
   </div>
+</div>
+
+<div *ngIf="isPromotionActive" class="promotion-dialog">
+  <img
+    *ngFor="let figure of availablePromotionFigureTypes()"
+    [src]="figureImageSource[figure]"
+    [alt]="figureImageSource[figure]"
+    (click)="promoteFigure(figure)"
+  />
+  <span class="close-promotion-dialog" (click)="closePawnPromotion()">
+    &times;
+  </span>
 </div>
 
 <div>

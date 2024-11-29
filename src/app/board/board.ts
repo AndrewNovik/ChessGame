@@ -8,6 +8,7 @@ import { Rook } from '../figures/rook/rook';
 import {
   Color,
   Coordinate,
+  Figure,
   KingChecking,
   LastMove,
   SafeMoves,
@@ -272,7 +273,13 @@ export class ChessBoard {
     return safeMoves;
   }
 
-  public moveFigure(prevX: number, prevY: number, newX: number, newY: number) {
+  public moveFigure(
+    prevX: number,
+    prevY: number,
+    newX: number,
+    newY: number,
+    promotedFigure: Figure | null
+  ) {
     // не выпрыгиваем за пределы доски
     if (!this.areCoordsValid(prevX, prevY) || !this.areCoordsValid(newX, newY))
       return;
@@ -326,6 +333,15 @@ export class ChessBoard {
       allyFigure.hasMoved = true;
     }
 
+    // если параметром передалось превращение
+    if (promotedFigure) {
+      this.chessBoard[newX][newY] = this.promotedFigure(promotedFigure);
+    } else {
+      this.chessBoard[newX][newY] = allyFigure;
+    }
+
+    this.chessBoard[prevX][prevY] = null;
+
     // запись прошлого хода
     this._lastMove = {
       piece: allyFigure,
@@ -334,9 +350,6 @@ export class ChessBoard {
       currX: newX,
       currY: newY,
     };
-
-    this.chessBoard[prevX][prevY] = null;
-    this.chessBoard[newX][newY] = allyFigure;
 
     // меняем активного игрока
     this._playerColor =
@@ -449,5 +462,28 @@ export class ChessBoard {
     this.chessBoard[currX][currY] = piece;
 
     return isPositionSafeAfterMove;
+  }
+
+  // функция которая создаст экземпляр нужной, выбранной фигуры
+  private promotedFigure(
+    promotedFigureType: Figure
+  ): Knight | Rook | Bishop | Queen {
+    if (
+      promotedFigureType === Figure.WhiteKnight ||
+      promotedFigureType === Figure.BlackKnight
+    )
+      return new Knight(this._playerColor);
+    if (
+      promotedFigureType === Figure.WhiteBishop ||
+      promotedFigureType === Figure.BlackBishop
+    )
+      return new Bishop(this._playerColor);
+    if (
+      promotedFigureType === Figure.WhiteRook ||
+      promotedFigureType === Figure.BlackRook
+    )
+      return new Rook(this._playerColor);
+
+    return new Queen(this._playerColor);
   }
 }

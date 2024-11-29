@@ -46,7 +46,7 @@
 .close-promotion-dialog {
   font-size: 45px;
   cursor: pointer;
-  color: white;
+  color: black;
 }
 
 .dark-cell {
@@ -66,6 +66,7 @@
   box-shadow: inset rgba(60, 70, 85, 0.5) 0px 0px 40px 0px,
     inset rgba(60, 70, 85, 0.5) 0px 0px 40px 0px,
     inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
+  transition: 0.1s;
 }
 
 .safe-cell {
@@ -75,22 +76,26 @@
   background-color: #bbb;
   border-radius: 50%;
   z-index: 100;
+  transition: 0.1s;
 }
 
 .king-in-check {
   box-shadow: inset rgb(228, 66, 45) 0px 0px 40px 0px,
     inset rgb(228, 66, 45) 0px 0px 40px 0px,
     inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
+  transition: 0.1s;
 }
 
 .last-move {
   box-shadow: inset rgb(133, 225, 130) 0px 0px 40px 0px,
     inset rgb(133, 225, 130) 0px 0px 40px 0px,
     inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
+  transition: 0.1s;
 }
 
-.promotion-square {
+.promotion-cell {
   box-shadow: inset rgb(0, 98, 150) 0px 0px 40px 0px,
     inset rgb(0, 98, 150) 0px 0px 40px 0px,
     inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
+  transition: 0.1s;
 }
