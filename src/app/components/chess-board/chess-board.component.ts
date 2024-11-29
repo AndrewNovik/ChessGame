@@ -128,6 +128,12 @@ export class ChessBoardComponent {
     // если ничего выше не произошло, просто сетим выбранную ячейку и обнуляем возможно выбранные ранее мувы
     this.selectedCell = { figure: null, x, y };
     this.figureSafeCells = [];
+
+    // закрытие модалки превращения, если решили не превращать пешку и кликнули на пустую клету
+    if (this.isPromotionActive) {
+      this.isPromotionActive = false;
+      this.promotionCoordinate = null;
+    }
   }
 
   public replaceFigure(
