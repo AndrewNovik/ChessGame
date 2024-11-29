@@ -9,6 +9,7 @@ import {
   Color,
   Coordinate,
   KingChecking,
+  LastMove,
   SafeMoves,
 } from '../interfaces/figures.interface';
 import { startBoardPosition } from './board.const';
@@ -20,8 +21,9 @@ export class ChessBoard {
   private chessBoard: (FigurePiece | null)[][] = startBoardPosition;
   private _safeCells: SafeMoves = this.findSafeMoves(); // Map<string, Coordinate[]>
   private _checkingKing: KingChecking = { isInCheck: false }; // {isInCheck: boolean; x: number; y: number;} default start king is no checked
+  private _lastMove: LastMove | undefined;
 
-  get safeCells() {
+  get safeCells(): SafeMoves {
     return this._safeCells;
   }
 
@@ -31,6 +33,10 @@ export class ChessBoard {
 
   get checkingKing(): KingChecking {
     return this._checkingKing;
+  }
+
+  get lastMove(): LastMove | undefined {
+    return this._lastMove;
   }
 
   // доска в формате массивов из обьектов фигур, null и тд.
@@ -243,6 +249,18 @@ export class ChessBoard {
                 figureSafeMoves.push({ x, y: 2 });
               }
             }
+
+            // добавление взятия на проходе если возможно
+            if (
+              startFigure instanceof Pawn &&
+              this.canEnpassant(startFigure, x, y)
+            ) {
+              // добавляем доступный ход за вражеской пешкой (на 1 по вертикали в зависимости от цвета и в сторону пешки врага)
+              figureSafeMoves.push({
+                x: x + (startFigure.color === Color.White ? 1 : -1),
+                y: this._lastMove!.prevY,
+              });
+            }
           }
 
           if (figureSafeMoves.length) {
@@ -286,6 +304,20 @@ export class ChessBoard {
       // сетим королю что он походил, если он еще не ходил
       allyFigure.hasMoved = true;
     }
+
+    if (
+      allyFigure instanceof Pawn &&
+      this._lastMove &&
+      this._lastMove.piece instanceof Pawn &&
+      Math.abs(this._lastMove.currX - this._lastMove.prevX) === 2 && // если пешка ходила на 2 поля вперед
+      prevX == this._lastMove.currX && // если они стояли на одной горизонтали
+      newY === this._lastMove.currY // если новая позиция по вертикали нашей пешки совпадает с вертикалью пешки врага
+    ) {
+      // значит случилось именно взятие на проходе и мы выполняем
+      // специальный ход, в котором кроме нашей передвинутой пешки нужно сбить и пешку врага. Проверка на шах уже была раньше.
+      this.chessBoard[this._lastMove.currX][this._lastMove.currY] = null;
+    }
+
     if (
       (allyFigure instanceof Pawn || allyFigure instanceof Rook) &&
       !allyFigure.hasMoved
@@ -293,6 +325,15 @@ export class ChessBoard {
       // пешке, ладье сетим, что они уже ходили, если они еще не ходили
       allyFigure.hasMoved = true;
     }
+
+    // запись прошлого хода
+    this._lastMove = {
+      piece: allyFigure,
+      prevX: prevX,
+      prevY: prevY,
+      currX: newX,
+      currY: newY,
+    };
 
     this.chessBoard[prevX][prevY] = null;
     this.chessBoard[newX][newY] = allyFigure;
@@ -373,5 +414,40 @@ export class ChessBoard {
       this.chessBoard[rookPositionX][rookNewPositionY] = rook;
       rook.hasMoved = true;
     }
+  }
+
+  private canEnpassant(pawn: Pawn, pawnX: number, pawnY: number): boolean {
+    if (!this._lastMove) return false;
+    const { piece, prevX, prevY, currX, currY } = this._lastMove;
+
+    // если прошлого хода не существует или на прошлом ходу ходила не пешка,
+    // или ходила пешка но не на 2 клетки вперед, или они стоят сейчас не на одной горизонтали
+    // или они не стоят рядом по оси игрик
+    if (
+      !(piece instanceof Pawn) ||
+      pawn.color !== this._playerColor ||
+      Math.abs(currX - prevX) !== 2 ||
+      pawnX !== currX ||
+      Math.abs(pawnY - currY) !== 1
+    )
+      return false;
+
+    // представляем, что передвигаем нашу пешку за вражескую пешку
+    const pawnNewPositionX: number =
+      pawnX + (pawn.color === Color.White ? 1 : -1);
+    const pawnNewPositionY: number = currY;
+
+    // проверяем не привело ли это к шаху, если сбили пешку и передвинули нашу
+    this.chessBoard[currX][currY] = null;
+    const isPositionSafeAfterMove: boolean = this.isPositionSafeAfterMove(
+      pawnX,
+      pawnY,
+      pawnNewPositionX,
+      pawnNewPositionY
+    );
+    // не забыли вернуть вражескую пешку обратно
+    this.chessBoard[currX][currY] = piece;
+
+    return isPositionSafeAfterMove;
   }
 }

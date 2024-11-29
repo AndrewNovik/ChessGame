@@ -6,7 +6,7 @@ import {
   Coordinate,
   FigureImageSource,
   KingChecking,
-  PrevMove,
+  LastMove,
   SafeMoves,
   SelectedCell,
 } from '../../interfaces/figures.interface';
@@ -28,8 +28,8 @@ export class ChessBoardComponent {
   public figureImageSource = FigureImageSource;
   public chessBoardFigures: (FigurePiece | null)[][] =
     this.chessBoard.chessBoardFigures;
-  public lastMove: PrevMove | undefined;
-  public recordedMoves: PrevMove[] = [];
+  public lastMove: LastMove | undefined = this.chessBoard.lastMove;
+  public recordedMoves: LastMove[] = [];
   private checkState: KingChecking = this.chessBoard.checkingKing;
 
   constructor() {}
@@ -57,7 +57,7 @@ export class ChessBoardComponent {
 
   isCellPrevMove(x: number, y: number): boolean {
     if (!this.lastMove) return false;
-    const { prevX, prevY, currX, currY } = this.lastMove;
+    const { prevX, prevY, currX, currY } = this.chessBoard.lastMove!;
     return (x === prevX && y === prevY) || (x === currX && y === currY);
   }
 
@@ -106,21 +106,15 @@ export class ChessBoardComponent {
     newY: number,
     selectedCell: CellWithFigure
   ): void {
-    // помечаем предыдущий ход
-    this.lastMove = {
-      color: this.playerColor,
-      prevX: selectedCell.x,
-      prevY: selectedCell.y,
-      currX: newX,
-      currY: newY,
-    };
-    // TO DO красивые иконки ходов
-    this.recordedMoves.push(this.lastMove);
-
     this.chessBoard.moveFigure(selectedCell.x, selectedCell.y, newX, newY);
     this.chessBoardFigures = this.chessBoard.chessBoardFigures;
     this.checkState = this.chessBoard.checkingKing;
     this.unmarkingSelectionAndSafeMoves();
+
+    // помечаем предыдущий ход
+    this.lastMove = this.chessBoard.lastMove;
+    // TO DO красивые иконки ходов
+    this.recordedMoves.push(this.lastMove!);
   }
 
   private unmarkingSelectionAndSafeMoves(): void {

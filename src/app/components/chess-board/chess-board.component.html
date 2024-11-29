@@ -36,7 +36,7 @@
   <div *ngFor="let move of recordedMoves">
     <span
       >{{
-        (move.color === "White" ? "W" : "B") +
+        (move.piece.color === "White" ? "W" : "B") +
           " " +
           move.prevX +
           " " +

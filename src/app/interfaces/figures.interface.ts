@@ -62,8 +62,8 @@ export const FigureImageSource: Readonly<Record<Figure, string>> = {
 
 export type SafeMoves = Map<string, Coordinate[]>;
 
-export type PrevMove = {
-  color: Color;
+export type LastMove = {
+  piece: FigurePiece;
   prevX: number;
   prevY: number;
   currX: number;
