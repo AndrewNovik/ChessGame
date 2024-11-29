@@ -1,19 +1,19 @@
 import { FigurePiece } from '../figures/figures';
 
 export enum Figure {
-  WhitePawn = 'WP',
-  WhiteKnight = 'WN',
-  WhiteBishop = 'WB',
-  WhiteRook = 'WR',
-  WhiteQueen = 'WQ',
-  WhiteKing = 'WK',
+  WhitePawn = 'P',
+  WhiteKnight = 'N',
+  WhiteBishop = 'B',
+  WhiteRook = 'R',
+  WhiteQueen = 'Q',
+  WhiteKing = 'K',
 
-  BlackPawn = 'BP',
-  BlackKnight = 'BN',
-  BlackBishop = 'BB',
-  BlackRook = 'BR',
-  BlackQueen = 'BQ',
-  BlackKing = 'BK',
+  BlackPawn = 'p',
+  BlackKnight = 'n',
+  BlackBishop = 'b',
+  BlackRook = 'r',
+  BlackQueen = 'q',
+  BlackKing = 'k',
 }
 
 export enum Color {

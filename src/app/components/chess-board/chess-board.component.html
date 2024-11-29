@@ -15,9 +15,6 @@
       (click)="move(x, y)"
     >
       <div [ngClass]="{ 'safe-cell': isCellSafeForSelectedFigure(x, y) }"></div>
-      <small style="position: absolute; bottom: 0; left: 0"
-        >{{ x }},{{ y }}</small
-      >
       <img
         *ngIf="cell"
         [src]="figureImageSource[cell.figure]"
@@ -26,6 +23,10 @@
       />
     </div>
   </div>
+</div>
+
+<div *ngIf="isGameOver" class="">
+  <span>{{ gameOverMessage }}</span>
 </div>
 
 <div *ngIf="isPromotionActive" class="promotion-dialog">

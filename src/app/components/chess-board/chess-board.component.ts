@@ -33,6 +33,12 @@ export class ChessBoardComponent {
   public lastMove: LastMove | undefined = this.chessBoard.lastMove;
   public recordedMoves: LastMove[] = [];
   private checkState: KingChecking = this.chessBoard.checkingKing;
+  public get isGameOver(): boolean {
+    return this.chessBoard.isGameOver;
+  }
+  public get gameOverMessage(): string | undefined {
+    return this.chessBoard.gameOverMessage;
+  }
 
   public isPromotionActive: boolean = false;
   private promotionCoordinate: Coordinate | null = null;
@@ -87,6 +93,7 @@ export class ChessBoardComponent {
   }
 
   move(x: number, y: number): void {
+    if (this.isGameOver) return;
     const piece: FigurePiece | null = this.chessBoardFigures[x][y];
     if (isEquel(this.selectedCell, { figure: piece?.figure || null, x, y })) {
       // удаляем выбранную фигуру и ее возможные ходы,
