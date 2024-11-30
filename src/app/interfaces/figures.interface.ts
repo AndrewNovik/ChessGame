@@ -46,18 +46,18 @@ type CellWithOutFigure = {
 };
 
 export const FigureImageSource: Readonly<Record<Figure, string>> = {
-  [Figure.WhitePawn]: 'assets/images/png/wp.png',
-  [Figure.WhiteKnight]: 'assets/images/png/wn.png',
-  [Figure.WhiteBishop]: 'assets/images/png/wb.png',
-  [Figure.WhiteRook]: 'assets/images/png/wr.png',
-  [Figure.WhiteQueen]: 'assets/images/png/wq.png',
-  [Figure.WhiteKing]: 'assets/images/png/wk.png',
-  [Figure.BlackPawn]: 'assets/images/png/bp.png',
-  [Figure.BlackKnight]: 'assets/images/png/bn.png',
-  [Figure.BlackBishop]: 'assets/images/png/bb.png',
-  [Figure.BlackRook]: 'assets/images/png/br.png',
-  [Figure.BlackQueen]: 'assets/images/png/bq.png',
-  [Figure.BlackKing]: 'assets/images/png/bk.png',
+  [Figure.WhitePawn]: 'assets/images/png/bw/wp.png',
+  [Figure.WhiteKnight]: 'assets/images/png/bw/wn.png',
+  [Figure.WhiteBishop]: 'assets/images/png/bw/wb.png',
+  [Figure.WhiteRook]: 'assets/images/png/bw/wr.png',
+  [Figure.WhiteQueen]: 'assets/images/png/bw/wq.png',
+  [Figure.WhiteKing]: 'assets/images/png/bw/wk.png',
+  [Figure.BlackPawn]: 'assets/images/png/bw/bp.png',
+  [Figure.BlackKnight]: 'assets/images/png/bw/bn.png',
+  [Figure.BlackBishop]: 'assets/images/png/bw/bb.png',
+  [Figure.BlackRook]: 'assets/images/png/bw/br.png',
+  [Figure.BlackQueen]: 'assets/images/png/bw/bq.png',
+  [Figure.BlackKing]: 'assets/images/png/bw/bk.png',
 };
 
 export const promotedFigureTypes = {

@@ -28,9 +28,13 @@ export class ChessBoardComponent {
   private selectedCell: SelectedCell = { figure: null };
   private figureSafeCells: Coordinate[] = [];
   public figureImageSource = FigureImageSource;
-  public chessBoardFigures: (FigurePiece | null)[][] =
-    this.chessBoard.chessBoardFigures;
-  public lastMove: LastMove | undefined = this.chessBoard.lastMove;
+  public get chessBoardFigures(): (FigurePiece | null)[][] {
+    return this.chessBoard.chessBoardFigures;
+  }
+
+  public get lastMove(): LastMove | undefined {
+    return this.chessBoard.lastMove;
+  }
   public recordedMoves: LastMove[] = [];
   private checkState: KingChecking = this.chessBoard.checkingKing;
   public get isGameOver(): boolean {
@@ -69,6 +73,13 @@ export class ChessBoardComponent {
   isCellSafeForSelectedFigure(x: number, y: number): boolean {
     return this.figureSafeCells.some(
       (mooves) => mooves.x === x && mooves.y === y
+    );
+  }
+
+  isCellSafeForAttackBySelectedFigure(x: number, y: number): boolean {
+    return (
+      this.figureSafeCells.some((mooves) => mooves.x === x && mooves.y === y) &&
+      this.chessBoardFigures[x][y] !== null
     );
   }
 
@@ -179,10 +190,7 @@ export class ChessBoardComponent {
 
   updateBoard(prevX: number, prevY: number, newX: number, newY: number) {
     this.chessBoard.moveFigure(prevX, prevY, newX, newY, this.promotedFigure);
-    this.chessBoardFigures = this.chessBoard.chessBoardFigures;
     this.checkState = this.chessBoard.checkingKing;
-    // помечаем предыдущий ход
-    this.lastMove = this.chessBoard.lastMove;
     // TO DO красивые иконки ходов
     this.recordedMoves.push(this.lastMove!);
     this.unmarkingSelectionAndSafeMoves();
@@ -215,6 +223,10 @@ export class ChessBoardComponent {
   // закрывается по клику во вью
   public closePawnPromotion(): void {
     this.unmarkingSelectionAndSafeMoves();
+  }
+
+  public restartGame() {
+    this.chessBoard.restartGame();
   }
 
   // private isEnemyFigureSelected(figure: FigurePiece | null): boolean {

@@ -14,12 +14,14 @@ import {
   SafeMoves,
 } from '../interfaces/figures.interface';
 import { startBoardPosition } from './board.const';
+import cloneDeep from 'lodash/cloneDeep';
 
 export class ChessBoard {
   private _playerColor: Color = Color.White;
   private readonly chessBoardSize: number = 8;
+  // копирование стартовой позиции с экземплярами классов фигур в доску
+  private chessBoard: (FigurePiece | null)[][] = cloneDeep(startBoardPosition);
 
-  private chessBoard: (FigurePiece | null)[][] = startBoardPosition;
   private _safeCells: SafeMoves = this.findSafeMoves(); // Map<string, Coordinate[]>
   private _checkingKing: KingChecking = { isInCheck: false }; // {isInCheck: boolean; x: number; y: number;} default start king is no checked
   private _lastMove: LastMove | undefined;
@@ -626,5 +628,17 @@ export class ChessBoard {
         bishops.map((bishop) => ChessBoard.isCellDark(bishop.x, bishop.y))
       ).size === 1;
     return bishops.length === pieces.length - 1 && areAllBishopsOfSameColor;
+  }
+
+  public restartGame() {
+    // ресет игры
+    this.fiftyMoveRuleCounter = 0;
+    this._lastMove = undefined;
+    this._isGameOver = false;
+    this._checkingKing.isInCheck = false;
+    this._gameOverMessage = undefined;
+    this._playerColor = Color.White;
+    this.chessBoard = cloneDeep(startBoardPosition);
+    this._safeCells = this.findSafeMoves();
   }
 }

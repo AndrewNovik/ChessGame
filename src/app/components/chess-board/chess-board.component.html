@@ -1,20 +1,27 @@
-<div class="chess-board">
+<div
+  *ngIf="chessBoardFigures"
+  class="vh-100 d-flex flex-column-reverse align-items-center justify-content-center"
+>
   <div *ngFor="let row of chessBoardFigures; let x = index" class="row">
     <div
-      style="position: relative"
       *ngFor="let cell of row; let y = index"
-      class="square"
+      class="square d-flex align-items-center justify-content-center position-relative"
       [ngClass]="{
         'selected-cell': isCellSelected(x, y),
         'dark-cell': isCellDark(x, y),
         'light-cell': !isCellDark(x, y),
         'last-move': isCellPrevMove(x, y),
         'king-in-check': isKingChecked(x, y),
-        'promotion-cell': isCellPromotionCell(x, y)
+        'promotion-cell': isCellPromotionCell(x, y),
       }"
       (click)="move(x, y)"
     >
-      <div [ngClass]="{ 'safe-cell': isCellSafeForSelectedFigure(x, y) }"></div>
+      <div
+        [ngClass]="{
+          'safe-cell': isCellSafeForSelectedFigure(x, y),
+          'safe-attack-cell': isCellSafeForAttackBySelectedFigure(x, y)
+        }"
+      ></div>
       <img
         *ngIf="cell"
         [src]="figureImageSource[cell.figure]"
@@ -23,22 +30,29 @@
       />
     </div>
   </div>
-</div>
+  <div
+    *ngIf="isPromotionActive"
+    class="promotion-modal position-absolute d-flex align-items-center justify-content-center p-3"
+  >
+    <img
+      *ngFor="let figure of availablePromotionFigureTypes()"
+      [src]="figureImageSource[figure]"
+      [alt]="figureImageSource[figure]"
+      (click)="promoteFigure(figure)"
+      class="m-3"
+    />
+    <span class="close-promotion-dialog" (click)="closePawnPromotion()">
+      &times;
+    </span>
+  </div>
 
-<div *ngIf="isGameOver" class="">
-  <span>{{ gameOverMessage }}</span>
-</div>
-
-<div *ngIf="isPromotionActive" class="promotion-dialog">
-  <img
-    *ngFor="let figure of availablePromotionFigureTypes()"
-    [src]="figureImageSource[figure]"
-    [alt]="figureImageSource[figure]"
-    (click)="promoteFigure(figure)"
-  />
-  <span class="close-promotion-dialog" (click)="closePawnPromotion()">
-    &times;
-  </span>
+  <div
+    *ngIf="isGameOver"
+    class="game-over-modal position-absolute d-flex align-items-center justify-content-center p-3"
+  >
+    <span class="m-3">{{ gameOverMessage }}</span>
+    <button (click)="restartGame()">Рестарт</button>
+  </div>
 </div>
 
 <div>

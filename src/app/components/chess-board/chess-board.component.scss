@@ -1,45 +1,28 @@
-.chess-board {
-  display: flex;
-  justify-content: center;
-  flex-direction: column-reverse;
-  width: 480px;
-  height: 480px;
-}
-
 .rotated {
   transform: rotate(180deg);
 }
 
-.row {
-  display: flex;
-  flex-direction: row;
-}
-
 .square {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 60px;
-  width: 60px;
+  height: calc(90vh / 8);
+  width: calc(90vh / 8);
   cursor: pointer;
   //border: 1px solid black;
   background-color: white;
 }
 
-.game-over-message {
-  color: white;
+.game-over-modal {
+  color: #000;
+  background-color: #ffffffd3;
+  box-shadow: 0px 0px 26px 10px rgba(34, 60, 80, 0.2);
 }
 
-.promotion-dialog {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 300px;
-  height: 100px;
+.promotion-modal {
+  background-color: #ffffffd3;
+  box-shadow: 0px 0px 26px 10px rgba(34, 60, 80, 0.2);
 }
 
 .promotion-dialog img {
-  height: 70px;
+  height: calc(90vh / 8);
   cursor: pointer;
 }
 
@@ -50,52 +33,61 @@
 }
 
 .dark-cell {
-  background-color: #b58863;
+  background-color: rgb(163, 184, 153);
 }
 
 .light-cell {
-  background-color: #f0d9b5;
+  background-color: rgb(221, 230, 213);
 }
 
 .piece {
-  width: 46px;
-  padding-top: 4px;
+  width: 90%;
 }
 
 .selected-cell {
-  box-shadow: inset rgba(60, 70, 85, 0.5) 0px 0px 40px 0px,
-    inset rgba(60, 70, 85, 0.5) 0px 0px 40px 0px,
-    inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
+  background-image: radial-gradient(
+    transparent 0%,
+    transparent 79%,
+    rgb(102, 123, 104, 0.7) 80%
+  );
   transition: 0.1s;
 }
 
 .safe-cell {
   position: absolute;
-  height: 20px;
-  width: 20px;
-  background-color: #bbb;
+  height: calc(90vh / 32);
+  width: calc(90vh / 32);
+  background-color: rgb(26, 71, 42, 0.8);
+  border-radius: 50%;
+  z-index: 100;
+  transition: 0.1s;
+}
+
+.safe-attack-cell {
+  position: absolute;
+  height: calc(90vh / 32);
+  width: calc(90vh / 32);
+  background-color: rgb(217, 83, 79, 0.8);
   border-radius: 50%;
   z-index: 100;
   transition: 0.1s;
 }
 
 .king-in-check {
-  box-shadow: inset rgb(228, 66, 45) 0px 0px 40px 0px,
-    inset rgb(228, 66, 45) 0px 0px 40px 0px,
+  box-shadow: inset rgb(217, 83, 79) 0px 0px 40px 0px,
+    inset rgb(217, 83, 79) 0px 0px 40px 0px,
     inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
   transition: 0.1s;
 }
 
 .last-move {
-  box-shadow: inset rgb(133, 225, 130) 0px 0px 40px 0px,
-    inset rgb(133, 225, 130) 0px 0px 40px 0px,
-    inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
+  background-color: rgb(102, 123, 104);
   transition: 0.1s;
 }
 
 .promotion-cell {
-  box-shadow: inset rgb(0, 98, 150) 0px 0px 40px 0px,
-    inset rgb(0, 98, 150) 0px 0px 40px 0px,
+  box-shadow: inset rgb(102, 123, 104) 0px 0px 40px 0px,
+    inset rgb(102, 123, 104) 0px 0px 40px 0px,
     inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
   transition: 0.1s;
 }
