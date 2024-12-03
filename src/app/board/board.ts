@@ -386,6 +386,18 @@ export class ChessBoard {
       // значит случилось именно взятие на проходе и мы выполняем
       // специальный ход, в котором кроме нашей передвинутой пешки нужно сбить и пешку врага. Проверка на шах уже была раньше.
       this.chessBoard[this._lastMove.currX][this._lastMove.currY] = null;
+
+      // считчик фигур
+      if (this.playerColor === Color.White) {
+        this._shotDownFigures.blackSideFigures.push(Figure.BlackPawn);
+        // белым добавляем стоимость пешки
+        this._shotDownFigures.count += 1;
+      }
+      if (this.playerColor === Color.Black) {
+        this._shotDownFigures.whiteSideFigures.push(Figure.WhitePawn);
+        // черным отнимаем
+        this._shotDownFigures.count -= 1;
+      }
     }
 
     if (
