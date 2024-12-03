@@ -11,15 +11,17 @@ import {
   promotedFigureTypes,
   SafeMoves,
   SelectedCell,
+  ShotDownFigureImageSource,
 } from '../../interfaces/figures.interface';
 import { CommonModule } from '@angular/common';
 import { isEquel } from '../../utils/helpers';
 import { FigurePiece } from '../../figures/figures';
+import { AbsPipe } from '../../utils/pipes/abs.pipe';
 
 @Component({
   selector: 'app-chess-board',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, AbsPipe],
   templateUrl: './chess-board.component.html',
   styleUrl: './chess-board.component.scss',
 })
@@ -28,6 +30,8 @@ export class ChessBoardComponent {
   private selectedCell: SelectedCell = { figure: null };
   private figureSafeCells: Coordinate[] = [];
   public figureImageSource = FigureImageSource;
+  public shotDownFigureImageSource = ShotDownFigureImageSource;
+  public shotDownFigures = this.chessBoard.shotDownFigures;
   public get chessBoardFigures(): (FigurePiece | null)[][] {
     return this.chessBoard.chessBoardFigures;
   }

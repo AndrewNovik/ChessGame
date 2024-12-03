@@ -2,6 +2,24 @@
   *ngIf="chessBoardFigures"
   class="vh-100 d-flex flex-column-reverse align-items-center justify-content-center"
 >
+  <div class="shot-down-area d-flex justify-content-end">
+    <div
+      *ngFor="let figure of shotDownFigures?.blackSideFigures"
+      class="shot-down-figures"
+    >
+      <img
+        class="shot-down-figure py-1"
+        [src]="shotDownFigureImageSource[figure]"
+        [alt]="shotDownFigureImageSource[figure]"
+      />
+    </div>
+    <div
+      *ngIf="shotDownFigures.count > 0"
+      class="shot-down-counter d-flex align-items-center ms-3"
+    >
+      <span>+{{ shotDownFigures.count | abs }}</span>
+    </div>
+  </div>
   <div *ngFor="let row of chessBoardFigures; let x = index" class="row">
     <div
       *ngFor="let cell of row; let y = index"
@@ -30,6 +48,24 @@
       />
     </div>
   </div>
+  <div class="shot-down-area d-flex justify-content-end">
+    <div
+      *ngFor="let figure of shotDownFigures?.whiteSideFigures"
+      class="shot-down-figures"
+    >
+      <img
+        class="shot-down-figure py-1"
+        [src]="shotDownFigureImageSource[figure]"
+        [alt]="shotDownFigureImageSource[figure]"
+      />
+    </div>
+    <div
+      *ngIf="shotDownFigures.count < 0"
+      class="shot-down-counter d-flex align-items-center ms-3"
+    >
+      <span>+{{ shotDownFigures.count | abs }}</span>
+    </div>
+  </div>
   <div
     *ngIf="isPromotionActive"
     class="promotion-modal position-absolute d-flex align-items-center justify-content-center p-3"
@@ -51,26 +87,26 @@
     class="game-over-modal position-absolute d-flex align-items-center justify-content-center p-3"
   >
     <span class="m-3">{{ gameOverMessage }}</span>
-    <button (click)="restartGame()">Рестарт</button>
+    <button (click)="restartGame()">New Game</button>
   </div>
 </div>
 
-<div>
-  <h3>Ход - {{ playerColor === "White" ? "Белых" : "Черных" }}</h3>
-</div>
-
-<div>
-  <h3>История ходов</h3>
-  <div *ngFor="let move of recordedMoves">
-    <span
-      >{{
-        (move.piece.color === "White" ? "W" : "B") +
-          " " +
-          move.prevX +
-          " " +
-          move.prevY
-      }}
-      на {{ move.currX + " " + move.currY }}</span
-    >
+<!-- <div>
+    <h3>Ход - {{ playerColor === "White" ? "Белых" : "Черных" }}</h3>
   </div>
-</div>
+
+  <div>
+    <h3>История ходов</h3>
+    <div *ngFor="let move of recordedMoves">
+      <span
+        >{{
+          (move.piece.color === "White" ? "W" : "B") +
+            " " +
+            move.prevX +
+            " " +
+            move.prevY
+        }}
+        на {{ move.currX + " " + move.currY }}</span
+      >
+    </div>
+  </div> -->

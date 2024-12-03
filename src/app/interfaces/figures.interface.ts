@@ -60,6 +60,21 @@ export const FigureImageSource: Readonly<Record<Figure, string>> = {
   [Figure.BlackKing]: 'assets/images/png/bw/bk.png',
 };
 
+export const ShotDownFigureImageSource: Readonly<Record<Figure, string>> = {
+  [Figure.WhitePawn]: 'assets/images/png/bw/wps.png',
+  [Figure.WhiteKnight]: 'assets/images/png/bw/wns.png',
+  [Figure.WhiteBishop]: 'assets/images/png/bw/wbs.png',
+  [Figure.WhiteRook]: 'assets/images/png/bw/wrs.png',
+  [Figure.WhiteQueen]: 'assets/images/png/bw/wqs.png',
+  [Figure.WhiteKing]: 'assets/images/png/bw/wks.png',
+  [Figure.BlackPawn]: 'assets/images/png/bw/bps.png',
+  [Figure.BlackKnight]: 'assets/images/png/bw/bns.png',
+  [Figure.BlackBishop]: 'assets/images/png/bw/bbs.png',
+  [Figure.BlackRook]: 'assets/images/png/bw/brs.png',
+  [Figure.BlackQueen]: 'assets/images/png/bw/bqs.png',
+  [Figure.BlackKing]: 'assets/images/png/bw/bks.png',
+};
+
 export const promotedFigureTypes = {
   whiteList: [
     Figure.WhiteKnight,
@@ -96,3 +111,9 @@ type KingNotChecked = {
 };
 
 export type KingChecking = KingChecked | KingNotChecked;
+
+export type ShotDownFigures = {
+  whiteSideFigures: Figure[];
+  blackSideFigures: Figure[];
+  count: number;
+};

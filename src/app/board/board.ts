@@ -12,6 +12,7 @@ import {
   KingChecking,
   LastMove,
   SafeMoves,
+  ShotDownFigures,
 } from '../interfaces/figures.interface';
 import { startBoardPosition } from './board.const';
 import cloneDeep from 'lodash/cloneDeep';
@@ -29,6 +30,15 @@ export class ChessBoard {
   private _isGameOver: boolean = false;
   private _gameOverMessage: string | undefined;
   private fiftyMoveRuleCounter: number = 0;
+  private _shotDownFigures: ShotDownFigures = {
+    whiteSideFigures: [],
+    blackSideFigures: [],
+    count: 0,
+  };
+
+  get shotDownFigures(): ShotDownFigures {
+    return this._shotDownFigures;
+  }
 
   get safeCells(): SafeMoves {
     return this._safeCells;
@@ -329,6 +339,33 @@ export class ChessBoard {
 
     // правило 50 ходов, в котором если не сбили ни одной фигиры и не походили пешкой ни разу ведет к ничьей
     const isFigureTaken: boolean = this.chessBoard[newX][newY] !== null;
+
+    // счетчик побитых фигур и их стоимость
+    if (isFigureTaken) {
+      const takenFigure = this.chessBoard[newX][newY] as FigurePiece;
+      let figureCost: number = 0;
+
+      if (takenFigure instanceof Queen) figureCost = 9;
+      if (takenFigure instanceof Rook) figureCost = 5;
+      if (takenFigure instanceof Bishop || takenFigure instanceof Knight)
+        figureCost = 3;
+      if (takenFigure instanceof Pawn) figureCost = 1;
+
+      if (this.playerColor === Color.White) {
+        this._shotDownFigures.blackSideFigures.push(
+          this.chessBoard[newX][newY]!.figure
+        );
+        // белым добавляем стоимость
+        this._shotDownFigures.count += figureCost;
+      }
+      if (this.playerColor === Color.Black) {
+        this._shotDownFigures.whiteSideFigures.push(
+          this.chessBoard[newX][newY]!.figure
+        );
+        // черным отнимаем
+        this._shotDownFigures.count -= figureCost;
+      }
+    }
 
     if (allyFigure instanceof Pawn || isFigureTaken) {
       // обнуляем счетчик
@@ -640,5 +677,10 @@ export class ChessBoard {
     this._playerColor = Color.White;
     this.chessBoard = cloneDeep(startBoardPosition);
     this._safeCells = this.findSafeMoves();
+    this._shotDownFigures = {
+      whiteSideFigures: [],
+      blackSideFigures: [],
+      count: 0,
+    };
   }
 }

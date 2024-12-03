@@ -91,3 +91,20 @@
     inset rgba(0, 0, 0, 1) 0px 0px 36px -24px;
   transition: 0.1s;
 }
+
+.shot-down-area {
+  height: 4vh;
+  width: calc(90vh);
+}
+
+.shot-down-figures {
+  margin-right: -8px;
+  &:last-child {
+    margin-right: 0px;
+  }
+}
+
+.shot-down-figure {
+  height: 100%;
+  opacity: 0.6;
+}
