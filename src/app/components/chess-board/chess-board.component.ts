@@ -29,35 +29,30 @@ export class ChessBoardComponent {
   private chessBoard: ChessBoard = new ChessBoard();
   private selectedCell: SelectedCell = { figure: null };
   private figureSafeCells: Coordinate[] = [];
-  public figureImageSource = FigureImageSource;
-  public shotDownFigureImageSource = ShotDownFigureImageSource;
-  public shotDownFigures = this.chessBoard.shotDownFigures;
-  public get chessBoardFigures(): (FigurePiece | null)[][] {
+  private promotionCoordinate: Coordinate | null = null;
+  private promotedFigure: Figure | null = null;
+  private checkState: KingChecking = this.chessBoard.checkingKing;
+
+  figureImageSource = FigureImageSource;
+  shotDownFigureImageSource = ShotDownFigureImageSource;
+  shotDownFigures = this.chessBoard.shotDownFigures;
+  recordedMoves: LastMove[] = [];
+  isPromotionActive: boolean = false;
+
+  get chessBoardFigures(): (FigurePiece | null)[][] {
     return this.chessBoard.chessBoardFigures;
   }
 
-  public get lastMove(): LastMove | undefined {
+  get lastMove(): LastMove | undefined {
     return this.chessBoard.lastMove;
   }
-  public recordedMoves: LastMove[] = [];
-  private checkState: KingChecking = this.chessBoard.checkingKing;
-  public get isGameOver(): boolean {
+
+  get isGameOver(): boolean {
     return this.chessBoard.isGameOver;
   }
-  public get gameOverMessage(): string | undefined {
+  get gameOverMessage(): string | undefined {
     return this.chessBoard.gameOverMessage;
   }
-
-  public isPromotionActive: boolean = false;
-  private promotionCoordinate: Coordinate | null = null;
-  private promotedFigure: Figure | null = null;
-  public availablePromotionFigureTypes(): Figure[] {
-    return this.playerColor === Color.White
-      ? promotedFigureTypes.whiteList
-      : promotedFigureTypes.blaclList;
-  }
-
-  constructor() {}
 
   get playerColor(): Color {
     return this.chessBoard.playerColor;
@@ -65,6 +60,14 @@ export class ChessBoardComponent {
   get safeCells(): SafeMoves {
     return this.chessBoard.safeCells;
   }
+
+  availablePromotionFigureTypes(): Figure[] {
+    return this.playerColor === Color.White
+      ? promotedFigureTypes.whiteList
+      : promotedFigureTypes.blaclList;
+  }
+
+  constructor() {}
 
   isCellDark(x: number, y: number): boolean {
     return ChessBoard.isCellDark(x, y);
@@ -158,7 +161,7 @@ export class ChessBoardComponent {
     }
   }
 
-  public replaceFigure(
+  replaceFigure(
     newX: number,
     newY: number,
     selectedCell: CellWithFigure
@@ -201,7 +204,7 @@ export class ChessBoardComponent {
   }
 
   // отрабрабатывает по клику по фигуре в модалке превращения
-  public promoteFigure(figure: Figure): void {
+  promoteFigure(figure: Figure): void {
     if (!this.promotionCoordinate || !this.selectedCell.figure) return;
 
     // важно задать фигуру превращения
@@ -225,11 +228,12 @@ export class ChessBoardComponent {
   }
 
   // закрывается по клику во вью
-  public closePawnPromotion(): void {
+  closePawnPromotion(): void {
     this.unmarkingSelectionAndSafeMoves();
   }
 
-  public restartGame() {
+  restartGame() {
+    this.recordedMoves = [];
     this.chessBoard.restartGame();
   }
 

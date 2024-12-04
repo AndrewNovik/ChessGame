@@ -3,8 +3,9 @@
 }
 
 .square {
-  height: calc(90vh / 8);
-  width: calc(90vh / 8);
+  width: 12.5%;
+  height: 0;
+  padding-top: 12.5%;
   cursor: pointer;
   //border: 1px solid black;
   background-color: white;
@@ -41,7 +42,9 @@
 }
 
 .piece {
-  width: 90%;
+  width: 75%;
+  position: absolute;
+  top: 12.5%;
 }
 
 .selected-cell {
@@ -55,8 +58,9 @@
 
 .safe-cell {
   position: absolute;
-  height: calc(90vh / 32);
-  width: calc(90vh / 32);
+  height: 22.5%;
+  width: 22.5%;
+  top: 40%;
   background-color: rgb(26, 71, 42, 0.8);
   border-radius: 50%;
   z-index: 100;
@@ -65,8 +69,9 @@
 
 .safe-attack-cell {
   position: absolute;
-  height: calc(90vh / 32);
-  width: calc(90vh / 32);
+  height: 22.5%;
+  width: 22.5%;
+  top: 40%;
   background-color: rgb(217, 83, 79, 0.8);
   border-radius: 50%;
   z-index: 100;
@@ -93,8 +98,11 @@
 }
 
 .shot-down-area {
-  height: 4vh;
-  width: calc(90vh);
+  height: 3vh;
+}
+
+.promotion-modal-figures {
+  width: 15%;
 }
 
 .shot-down-figures {

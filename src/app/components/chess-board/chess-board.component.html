@@ -1,112 +1,122 @@
 <div
   *ngIf="chessBoardFigures"
-  class="vh-100 d-flex flex-column-reverse align-items-center justify-content-center"
+  class="container align-items-center justify-content-center"
 >
-  <div class="shot-down-area d-flex justify-content-end">
+  <div class="row">
     <div
-      *ngFor="let figure of shotDownFigures?.blackSideFigures"
-      class="shot-down-figures"
+      class="main-board col-md-8 d-flex flex-column-reverse align-items-center justify-content-center"
     >
-      <img
-        class="shot-down-figure py-1"
-        [src]="shotDownFigureImageSource[figure]"
-        [alt]="shotDownFigureImageSource[figure]"
-      />
-    </div>
-    <div
-      *ngIf="shotDownFigures.count > 0"
-      class="shot-down-counter d-flex align-items-center ms-3"
-    >
-      <span>+{{ shotDownFigures.count | abs }}</span>
-    </div>
-  </div>
-  <div *ngFor="let row of chessBoardFigures; let x = index" class="row">
-    <div
-      *ngFor="let cell of row; let y = index"
-      class="square d-flex align-items-center justify-content-center position-relative"
-      [ngClass]="{
-        'selected-cell': isCellSelected(x, y),
-        'dark-cell': isCellDark(x, y),
-        'light-cell': !isCellDark(x, y),
-        'last-move': isCellPrevMove(x, y),
-        'king-in-check': isKingChecked(x, y),
-        'promotion-cell': isCellPromotionCell(x, y),
-      }"
-      (click)="move(x, y)"
-    >
+      <div class="shot-down-area d-flex align-self-end justify-content-end">
+        <div
+          *ngFor="let figure of shotDownFigures?.blackSideFigures"
+          class="shot-down-figures d-flex align-items-center"
+        >
+          <img
+            class="shot-down-figure py-1"
+            [src]="shotDownFigureImageSource[figure]"
+            [alt]="shotDownFigureImageSource[figure]"
+          />
+        </div>
+        <div
+          *ngIf="shotDownFigures.count > 0"
+          class="shot-down-counter d-flex align-items-center ms-3"
+        >
+          <span>+{{ shotDownFigures.count | abs }}</span>
+        </div>
+      </div>
       <div
-        [ngClass]="{
-          'safe-cell': isCellSafeForSelectedFigure(x, y),
-          'safe-attack-cell': isCellSafeForAttackBySelectedFigure(x, y)
+        *ngFor="let row of chessBoardFigures; let x = index"
+        class="row w-100"
+      >
+        <div
+          *ngFor="let cell of row; let y = index"
+          class="square d-flex align-items-center justify-content-center position-relative"
+          [ngClass]="{
+          'selected-cell': isCellSelected(x, y),
+          'dark-cell': isCellDark(x, y),
+          'light-cell': !isCellDark(x, y),
+          'last-move': isCellPrevMove(x, y),
+          'king-in-check': isKingChecked(x, y),
+          'promotion-cell': isCellPromotionCell(x, y),
         }"
-      ></div>
-      <img
-        *ngIf="cell"
-        [src]="figureImageSource[cell.figure]"
-        [alt]="cell.figure"
-        class="piece"
-      />
-    </div>
-  </div>
-  <div class="shot-down-area d-flex justify-content-end">
-    <div
-      *ngFor="let figure of shotDownFigures?.whiteSideFigures"
-      class="shot-down-figures"
-    >
-      <img
-        class="shot-down-figure py-1"
-        [src]="shotDownFigureImageSource[figure]"
-        [alt]="shotDownFigureImageSource[figure]"
-      />
-    </div>
-    <div
-      *ngIf="shotDownFigures.count < 0"
-      class="shot-down-counter d-flex align-items-center ms-3"
-    >
-      <span>+{{ shotDownFigures.count | abs }}</span>
-    </div>
-  </div>
-  <div
-    *ngIf="isPromotionActive"
-    class="promotion-modal position-absolute d-flex align-items-center justify-content-center p-3"
-  >
-    <img
-      *ngFor="let figure of availablePromotionFigureTypes()"
-      [src]="figureImageSource[figure]"
-      [alt]="figureImageSource[figure]"
-      (click)="promoteFigure(figure)"
-      class="m-3"
-    />
-    <span class="close-promotion-dialog" (click)="closePawnPromotion()">
-      &times;
-    </span>
-  </div>
+          (click)="move(x, y)"
+        >
+          <div
+            [ngClass]="{
+              'safe-cell': isCellSafeForSelectedFigure(x, y),
+              'safe-attack-cell': isCellSafeForAttackBySelectedFigure(x, y)
+            }"
+          ></div>
+          <img
+            *ngIf="cell"
+            [src]="figureImageSource[cell.figure]"
+            [alt]="cell.figure"
+            class="piece"
+          />
+        </div>
+      </div>
+      <div class="shot-down-area d-flex align-self-end justify-content-end">
+        <div
+          *ngFor="let figure of shotDownFigures?.whiteSideFigures"
+          class="shot-down-figures"
+        >
+          <img
+            class="shot-down-figure py-1"
+            [src]="shotDownFigureImageSource[figure]"
+            [alt]="shotDownFigureImageSource[figure]"
+          />
+        </div>
+        <div
+          *ngIf="shotDownFigures.count < 0"
+          class="shot-down-counter d-flex align-items-center ms-3"
+        >
+          <span>+{{ shotDownFigures.count | abs }}</span>
+        </div>
+      </div>
 
-  <div
-    *ngIf="isGameOver"
-    class="game-over-modal position-absolute d-flex align-items-center justify-content-center p-3"
-  >
-    <span class="m-3">{{ gameOverMessage }}</span>
-    <button (click)="restartGame()">New Game</button>
+      <div
+        *ngIf="isPromotionActive"
+        class="promotion-modal position-absolute d-flex align-items-center justify-content-center p-3"
+      >
+        <img
+          *ngFor="let figure of availablePromotionFigureTypes()"
+          [src]="figureImageSource[figure]"
+          [alt]="figureImageSource[figure]"
+          (click)="promoteFigure(figure)"
+          class="promotion-modal-figures m-3"
+        />
+        <span class="close-promotion-dialog" (click)="closePawnPromotion()">
+          &times;
+        </span>
+      </div>
+
+      <div *ngIf="isGameOver" class="game-over-modal position-absolute p-3">
+        <span class="m-3">{{ gameOverMessage }}</span>
+        <button (click)="restartGame()">New Game</button>
+      </div>
+    </div>
+    <div
+      class="col-md-4 d-flex align-items-center justify-content-center flex-column"
+    >
+      <div>
+        <h3>Ход - {{ playerColor === "White" ? "Белых" : "Черных" }}</h3>
+      </div>
+
+      <div>
+        <h3>История ходов</h3>
+        <div *ngFor="let move of recordedMoves">
+          <span
+            >{{
+              (move.piece.color === "White" ? "W" : "B") +
+                " " +
+                move.prevX +
+                " " +
+                move.prevY
+            }}
+            на {{ move.currX + " " + move.currY }}</span
+          >
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-
-<!-- <div>
-    <h3>Ход - {{ playerColor === "White" ? "Белых" : "Черных" }}</h3>
-  </div>
-
-  <div>
-    <h3>История ходов</h3>
-    <div *ngFor="let move of recordedMoves">
-      <span
-        >{{
-          (move.piece.color === "White" ? "W" : "B") +
-            " " +
-            move.prevX +
-            " " +
-            move.prevY
-        }}
-        на {{ move.currX + " " + move.currY }}</span
-      >
-    </div>
-  </div> -->

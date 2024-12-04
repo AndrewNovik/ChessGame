@@ -52,3 +52,9 @@ export const startBoardPosition = [
     new Rook(Color.Black),
   ],
 ];
+
+export const emptyShotDownFiguresList = {
+  whiteSideFigures: [],
+  blackSideFigures: [],
+  count: 0,
+};

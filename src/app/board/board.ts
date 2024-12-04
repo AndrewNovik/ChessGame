@@ -14,7 +14,7 @@ import {
   SafeMoves,
   ShotDownFigures,
 } from '../interfaces/figures.interface';
-import { startBoardPosition } from './board.const';
+import { emptyShotDownFiguresList, startBoardPosition } from './board.const';
 import cloneDeep from 'lodash/cloneDeep';
 
 export class ChessBoard {
@@ -30,11 +30,7 @@ export class ChessBoard {
   private _isGameOver: boolean = false;
   private _gameOverMessage: string | undefined;
   private fiftyMoveRuleCounter: number = 0;
-  private _shotDownFigures: ShotDownFigures = {
-    whiteSideFigures: [],
-    blackSideFigures: [],
-    count: 0,
-  };
+  private _shotDownFigures: ShotDownFigures = emptyShotDownFiguresList;
 
   get shotDownFigures(): ShotDownFigures {
     return this._shotDownFigures;
@@ -689,10 +685,8 @@ export class ChessBoard {
     this._playerColor = Color.White;
     this.chessBoard = cloneDeep(startBoardPosition);
     this._safeCells = this.findSafeMoves();
-    this._shotDownFigures = {
-      whiteSideFigures: [],
-      blackSideFigures: [],
-      count: 0,
-    };
+    this._shotDownFigures.blackSideFigures = [];
+    this._shotDownFigures.whiteSideFigures = [];
+    this._shotDownFigures.count = 0;
   }
 }
