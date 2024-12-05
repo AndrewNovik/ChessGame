@@ -407,20 +407,28 @@ export class ChessBoard {
     // если параметром передалось превращение
     if (promotedFigure) {
       this.chessBoard[newX][newY] = this.promotedFigure(promotedFigure);
+      // запись прошлого хода
+      this._lastMove = {
+        piece: allyFigure,
+        prevX: prevX,
+        prevY: prevY,
+        currX: newX,
+        currY: newY,
+        promotedPiece: this.chessBoard[newX][newY]!.figure,
+      };
     } else {
       this.chessBoard[newX][newY] = allyFigure;
+      // запись прошлого хода
+      this._lastMove = {
+        piece: allyFigure,
+        prevX: prevX,
+        prevY: prevY,
+        currX: newX,
+        currY: newY,
+      };
     }
 
     this.chessBoard[prevX][prevY] = null;
-
-    // запись прошлого хода
-    this._lastMove = {
-      piece: allyFigure,
-      prevX: prevX,
-      prevY: prevY,
-      currX: newX,
-      currY: newY,
-    };
 
     // меняем активного игрока
     this._playerColor =
@@ -688,5 +696,11 @@ export class ChessBoard {
     this._shotDownFigures.blackSideFigures = [];
     this._shotDownFigures.whiteSideFigures = [];
     this._shotDownFigures.count = 0;
+  }
+
+  surrenderGame() {
+    this._isGameOver = true;
+    this._gameOverMessage =
+      this._playerColor === Color.White ? 'White gave up' : 'Black gave up';
   }
 }

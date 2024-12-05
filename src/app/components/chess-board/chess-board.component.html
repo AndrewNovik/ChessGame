@@ -4,7 +4,7 @@
 >
   <div class="row">
     <div
-      class="main-board col-md-8 d-flex flex-column-reverse align-items-center justify-content-center"
+      class="main-board col-md-8 d-flex flex-column-reverse align-items-center justify-content-center px-0"
     >
       <div class="shot-down-area d-flex align-self-end justify-content-end">
         <div
@@ -26,7 +26,7 @@
       </div>
       <div
         *ngFor="let row of chessBoardFigures; let x = index"
-        class="row w-100"
+        class="row w-100 board"
       >
         <div
           *ngFor="let cell of row; let y = index"
@@ -47,6 +47,16 @@
               'safe-attack-cell': isCellSafeForAttackBySelectedFigure(x, y)
             }"
           ></div>
+          <div *ngIf="y === 0" class="coordinates-x d-flex position-absolute">
+            <span>
+              {{ x + 1 }}
+            </span>
+          </div>
+          <div *ngIf="x === 0" class="coordinates-y d-flex position-absolute">
+            <span>
+              {{ y | ycc }}
+            </span>
+          </div>
           <img
             *ngIf="cell"
             [src]="figureImageSource[cell.figure]"
@@ -92,31 +102,50 @@
 
       <div *ngIf="isGameOver" class="game-over-modal position-absolute p-3">
         <span class="m-3">{{ gameOverMessage }}</span>
-        <button (click)="restartGame()">New Game</button>
+        <button (click)="restartGame()" class="btn-end-game">New Game</button>
       </div>
     </div>
-    <div
-      class="col-md-4 d-flex align-items-center justify-content-center flex-column"
-    >
-      <div>
-        <h3>Ход - {{ playerColor === "White" ? "Белых" : "Черных" }}</h3>
+    <div class="side-bar col-md-4 d-flex justify-content-start flex-column">
+      <div class="game-menu d-flex">
+        <button (click)="restartGame()" class="btn-new-game me-2">
+          Restart Game
+        </button>
+        <button
+          *ngIf="recordedMoves.length"
+          (click)="surrenderGame()"
+          class="btn-surrender-game"
+        >
+          Surrender
+        </button>
+        <!-- <button (click)="offerDrawGame()" class="btn-draw-game">Offer a draw</button> -->
       </div>
-
-      <div>
-        <h3>История ходов</h3>
-        <div *ngFor="let move of recordedMoves">
+      <div
+        *ngIf="recordedMoves.length"
+        class="recorded-moves d-flex justify-content-start flex-row flex-wrap w-100 align-content-start mt-2"
+      >
+        <div
+          *ngFor="let move of recordedMoves; let index = index"
+          class="recorded-move ps-1 d-flex align-items-center"
+        >
+          <img
+            [src]="figureImageSource[move.piece.figure]"
+            [alt]="figureImageSource[move.piece.figure]"
+          />
           <span
-            >{{
-              (move.piece.color === "White" ? "W" : "B") +
-                " " +
-                move.prevX +
-                " " +
-                move.prevY
-            }}
-            на {{ move.currX + " " + move.currY }}</span
+            >{{ (move.prevY | ycc) + (move.prevX + 1) }}
+            ⇒
+            {{ (move.currY | ycc) + (move.currX + 1) }}
+            {{ move.promotedPiece ? "⇒" : "" }}</span
           >
+          <img
+            *ngIf="move.promotedPiece"
+            [src]="figureImageSource[move.promotedPiece]"
+            [alt]="figureImageSource[move.promotedPiece]"
+          />
         </div>
       </div>
+
+      <div class="board-naviagation"></div>
     </div>
   </div>
 </div>

@@ -98,6 +98,7 @@ export type LastMove = {
   prevY: number;
   currX: number;
   currY: number;
+  promotedPiece?: Figure;
 };
 
 type KingChecked = {

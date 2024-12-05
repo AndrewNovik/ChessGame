@@ -17,11 +17,12 @@ import { CommonModule } from '@angular/common';
 import { isEquel } from '../../utils/helpers';
 import { FigurePiece } from '../../figures/figures';
 import { AbsPipe } from '../../utils/pipes/abs.pipe';
+import { YcoordinateConverterPipe } from '../../utils/pipes/y-coordinate-converter.pipe';
 
 @Component({
   selector: 'app-chess-board',
   standalone: true,
-  imports: [CommonModule, AbsPipe],
+  imports: [CommonModule, AbsPipe, YcoordinateConverterPipe],
   templateUrl: './chess-board.component.html',
   styleUrl: './chess-board.component.scss',
 })
@@ -235,6 +236,10 @@ export class ChessBoardComponent {
   restartGame() {
     this.recordedMoves = [];
     this.chessBoard.restartGame();
+  }
+
+  surrenderGame() {
+    this.chessBoard.surrenderGame();
   }
 
   // private isEnemyFigureSelected(figure: FigurePiece | null): boolean {
