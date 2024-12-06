@@ -16,6 +16,7 @@ import {
 } from '../interfaces/figures.interface';
 import { emptyShotDownFiguresList, startBoardPosition } from './board.const';
 import cloneDeep from 'lodash/cloneDeep';
+import { FENconvertor } from './FEN-converter';
 
 export class ChessBoard {
   private _playerColor: Color = Color.White;
@@ -30,7 +31,9 @@ export class ChessBoard {
   private _isGameOver: boolean = false;
   private _gameOverMessage: string | undefined;
   private fiftyMoveRuleCounter: number = 0;
+  private fullMovesCounter: number = 1;
   private _shotDownFigures: ShotDownFigures = emptyShotDownFiguresList;
+  private fenConverter: FENconvertor = new FENconvertor();
 
   get shotDownFigures(): ShotDownFigures {
     return this._shotDownFigures;
@@ -66,6 +69,8 @@ export class ChessBoard {
       return row.map((cell) => (cell?.figure ? cell : null));
     });
   }
+
+  constructor() {}
 
   // метод который используется во вью для чередования темных и светлых клеток
   static isCellDark(x: number, y: number): boolean {
@@ -442,6 +447,11 @@ export class ChessBoard {
 
     // проверяем не закончилась ли игра
     this._isGameOver = this.isGameFinished();
+
+    // счетчик полных ходов, когда походил и белые и черные
+    if (this._playerColor === Color.White) {
+      this.fullMovesCounter++;
+    }
   }
 
   private canCastle(king: King, kingShortSideCastle: boolean): boolean {
@@ -683,7 +693,7 @@ export class ChessBoard {
     return bishops.length === pieces.length - 1 && areAllBishopsOfSameColor;
   }
 
-  public restartGame() {
+  restartGame() {
     // ресет игры
     this.fiftyMoveRuleCounter = 0;
     this._lastMove = undefined;
@@ -696,6 +706,7 @@ export class ChessBoard {
     this._shotDownFigures.blackSideFigures = [];
     this._shotDownFigures.whiteSideFigures = [];
     this._shotDownFigures.count = 0;
+    this.fullMovesCounter = 1;
   }
 
   surrenderGame() {

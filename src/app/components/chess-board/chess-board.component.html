@@ -106,30 +106,30 @@
       </div>
     </div>
     <div class="side-bar col-md-4 d-flex justify-content-start flex-column">
-      <div class="game-menu d-flex">
+      <div [class.enabled]="recordedMoves.length" class="game-menu d-flex">
         <button (click)="restartGame()" class="btn-new-game me-2">
           Restart Game
         </button>
-        <button
-          *ngIf="recordedMoves.length"
-          (click)="surrenderGame()"
-          class="btn-surrender-game"
-        >
+        <button (click)="surrenderGame()" class="btn-surrender-game">
           Surrender
         </button>
         <!-- <button (click)="offerDrawGame()" class="btn-draw-game">Offer a draw</button> -->
       </div>
       <div
-        *ngIf="recordedMoves.length"
+        [class.enabled]="recordedMoves.length"
         class="recorded-moves d-flex justify-content-start flex-row flex-wrap w-100 align-content-start mt-2"
       >
         <div
           *ngFor="let move of recordedMoves; let index = index"
-          class="recorded-move ps-1 d-flex align-items-center"
+          class="recorded-move d-flex align-items-center"
         >
+          <span *ngIf="index % 2 == 0" class="px-2 full-move-index">{{
+            index / 2 + 1
+          }}</span>
           <img
             [src]="figureImageSource[move.piece.figure]"
             [alt]="figureImageSource[move.piece.figure]"
+            class="ps-1"
           />
           <span
             >{{ (move.prevY | ycc) + (move.prevX + 1) }}

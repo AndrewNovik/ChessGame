@@ -7,7 +7,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class YcoordinateConverterPipe implements PipeTransform {
   result: string = '';
   transform(num: number): string {
-    console.log(num);
     switch (num) {
       case 0:
         this.result = 'a';

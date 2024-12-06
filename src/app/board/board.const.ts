@@ -58,3 +58,5 @@ export const emptyShotDownFiguresList = {
   blackSideFigures: [],
   count: 0,
 };
+
+export const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
