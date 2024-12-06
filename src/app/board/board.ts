@@ -33,7 +33,12 @@ export class ChessBoard {
   private fiftyMoveRuleCounter: number = 0;
   private fullMovesCounter: number = 1;
   private _shotDownFigures: ShotDownFigures = emptyShotDownFiguresList;
-  private fenConverter: FENconvertor = new FENconvertor();
+  private FENconverter: FENconvertor = new FENconvertor();
+  private _boardAsFEN: string =
+    'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+  private threeFoldRepetitionDictionary = new Map<string, number>();
+  private threeFoldRepetition: boolean = false;
 
   get shotDownFigures(): ShotDownFigures {
     return this._shotDownFigures;
@@ -68,6 +73,10 @@ export class ChessBoard {
     return this.chessBoard.map((row) => {
       return row.map((cell) => (cell?.figure ? cell : null));
     });
+  }
+
+  get boardAsFEN() {
+    return this._boardAsFEN;
   }
 
   constructor() {}
@@ -445,13 +454,23 @@ export class ChessBoard {
     // пересчитываем доступные ходы
     this._safeCells = this.findSafeMoves();
 
-    // проверяем не закончилась ли игра
-    this._isGameOver = this.isGameFinished();
-
     // счетчик полных ходов, когда походил и белые и черные
     if (this._playerColor === Color.White) {
       this.fullMovesCounter++;
     }
+
+    this._boardAsFEN = this.FENconverter.convertBoardToFEN(
+      this.chessBoard,
+      this._playerColor,
+      this._lastMove,
+      this.fiftyMoveRuleCounter,
+      this.fullMovesCounter
+    );
+
+    this.updateThreeFoldRepetionDictionary(this._boardAsFEN);
+
+    // проверяем не закончилась ли игра
+    this._isGameOver = this.isGameFinished();
   }
 
   private canCastle(king: King, kingShortSideCastle: boolean): boolean {
@@ -598,6 +617,11 @@ export class ChessBoard {
       return true;
     }
 
+    if (this.threeFoldRepetition) {
+      this._gameOverMessage = 'Draw due three fold repetition rule';
+      return true;
+    }
+
     // правило 50 ходов
     if (this.fiftyMoveRuleCounter === 50) {
       this._gameOverMessage = 'Draw due fifty move rule';
@@ -707,11 +731,37 @@ export class ChessBoard {
     this._shotDownFigures.whiteSideFigures = [];
     this._shotDownFigures.count = 0;
     this.fullMovesCounter = 1;
+    this.threeFoldRepetitionDictionary.clear();
+    this.threeFoldRepetition = false;
   }
 
   surrenderGame() {
     this._isGameOver = true;
     this._gameOverMessage =
       this._playerColor === Color.White ? 'White gave up' : 'Black gave up';
+  }
+
+  private updateThreeFoldRepetionDictionary(FEN: string): void {
+    // fen строка без лишних данных,без пробелов, теперь это наш ключ (к позиции)
+    const threeFoldRepetitionFENkey: string = FEN.split(' ')
+      .slice(0, 4)
+      .join('');
+
+    // смотрим есть ли в библиотеке по нашему ключу значение
+    const threeFoldREpetitionValue: number | undefined =
+      this.threeFoldRepetitionDictionary.get(threeFoldRepetitionFENkey);
+
+    if (threeFoldREpetitionValue === undefined) {
+      // если нет, то сетим значение 1
+      this.threeFoldRepetitionDictionary.set(threeFoldRepetitionFENkey, 1);
+    } else {
+      // если там уже есть 2 повторения то вырубаем игру
+      if (threeFoldREpetitionValue === 2) {
+        this.threeFoldRepetition = true;
+        return;
+      }
+      // а если там единичка, то значит такая позиция уже есть и началось повторение
+      this.threeFoldRepetitionDictionary.set(threeFoldRepetitionFENkey, 2);
+    }
   }
 }

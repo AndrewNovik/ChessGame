@@ -80,7 +80,6 @@ export class FENconvertor {
 
     if (piece instanceof Pawn && Math.abs(currX - prevX) === 2) {
       const row: number = color === Color.White ? 6 : 3;
-      console.log(columns[prevY] + String(row));
       return columns[prevY] + String(row);
     }
 

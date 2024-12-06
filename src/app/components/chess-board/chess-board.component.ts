@@ -234,6 +234,8 @@ export class ChessBoardComponent {
   }
 
   restartGame() {
+    this.selectedCell = { figure: null };
+    this.figureSafeCells = [];
     this.recordedMoves = [];
     this.chessBoard.restartGame();
   }
