@@ -187,7 +187,7 @@
 }
 
 .btn-new-game {
-  border: 2px solid rgb(248, 211, 197);
+  border: 2px solid rgb(252, 238, 233);
   background-color: rgb(252, 238, 233);
   padding: 0.3rem 0.8rem;
   box-shadow: 0 1px 2px 0 rgb(252, 238, 233), 0 1px 2px 0px rgb(252, 238, 233),
@@ -209,6 +209,15 @@
   padding: 0.3rem 0.8rem;
   box-shadow: 0 1px 2px 0 rgb(246, 144, 126), 0 1px 2px 0px rgb(246, 144, 126),
     0 2px 2px 0 rgb(246, 144, 126);
+  color: #fff;
+}
+
+.btn-flip-board {
+  border: 0;
+  background-color: rgb(102, 123, 104);
+  padding: 0.3rem 0.8rem;
+  box-shadow: 0 1px 2px 0 rgb(102, 123, 104), 0 1px 2px 0px rgb(102, 123, 104),
+    0 2px 2px 0 rgb(102, 123, 104);
   color: #fff;
 }
 

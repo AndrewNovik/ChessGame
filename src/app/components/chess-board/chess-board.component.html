@@ -4,7 +4,11 @@
 >
   <div class="row">
     <div
-      class="main-board col-md-8 d-flex flex-column-reverse align-items-center justify-content-center px-0"
+      [ngClass]="{
+      'flex-column-reverse': !isBoardFlipped,
+      'flex-column': isBoardFlipped,
+    }"
+      class="main-board col-md-8 d-flex align-items-center justify-content-center px-0"
     >
       <div class="shot-down-area d-flex align-self-end justify-content-end">
         <div
@@ -106,10 +110,14 @@
       </div>
     </div>
     <div class="side-bar col-md-4 d-flex justify-content-start flex-column">
-      <div [class.enabled]="recordedMoves.length" class="game-menu d-flex">
-        <button (click)="restartGame()" class="btn-new-game me-2">
+      <div
+        [class.enabled]="recordedMoves.length"
+        class="game-menu d-flex justify-content-between"
+      >
+        <button (click)="restartGame()" class="btn-new-game">
           Restart Game
         </button>
+        <button (click)="flipBoard()" class="btn-flip-board">Flip board</button>
         <button (click)="surrenderGame()" class="btn-surrender-game">
           Surrender
         </button>

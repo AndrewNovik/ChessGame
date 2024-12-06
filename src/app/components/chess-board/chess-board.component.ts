@@ -39,6 +39,7 @@ export class ChessBoardComponent {
   shotDownFigures = this.chessBoard.shotDownFigures;
   recordedMoves: LastMove[] = [];
   isPromotionActive: boolean = false;
+  isBoardFlipped: boolean = false;
 
   get chessBoardFigures(): (FigurePiece | null)[][] {
     return this.chessBoard.chessBoardFigures;
@@ -202,6 +203,7 @@ export class ChessBoardComponent {
     // TO DO красивые иконки ходов
     this.recordedMoves.push(this.lastMove!);
     this.unmarkingSelectionAndSafeMoves();
+    this.flipBoard();
   }
 
   // отрабрабатывает по клику по фигуре в модалке превращения
@@ -242,6 +244,10 @@ export class ChessBoardComponent {
 
   surrenderGame() {
     this.chessBoard.surrenderGame();
+  }
+
+  flipBoard() {
+    this.isBoardFlipped = !this.isBoardFlipped;
   }
 
   // private isEnemyFigureSelected(figure: FigurePiece | null): boolean {
