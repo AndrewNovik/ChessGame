@@ -306,6 +306,7 @@ export class ChessBoardComponent implements OnInit, OnDestroy {
     this.figureSafeCells = [];
     this.recordedMoves = [];
     this.isNewGame = true;
+    this.evalValue = 0;
     this.chessBoard.restartGame();
   }
 
