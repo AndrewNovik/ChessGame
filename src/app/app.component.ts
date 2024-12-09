@@ -10,6 +10,4 @@ import { ChessBoardComponent } from './components/chess-board/chess-board.compon
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent {
-  title = 'chess';
-}
+export class AppComponent {}

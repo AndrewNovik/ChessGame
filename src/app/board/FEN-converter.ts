@@ -40,7 +40,7 @@ export class FENconvertor {
     const player: string = playerColor === Color.White ? 'w' : 'b';
     FEN += ' ' + player;
     FEN += ' ' + this.canCastling(board);
-    FEN += ' ' + this.canEnPassant(lastMove, playerColor);
+    FEN += ' ' + this.canEnPassant(lastMove, playerColor, board);
     FEN += ' ' + fiftyMoveRuleCounter * 2;
     FEN += ' ' + fullMovesCounter;
     return FEN;
@@ -74,11 +74,27 @@ export class FENconvertor {
     return canCastling !== '' ? canCastling : '-';
   }
 
-  private canEnPassant(lastMove: LastMove | undefined, color: Color): string {
+  private canEnPassant(
+    lastMove: LastMove | undefined,
+    color: Color,
+    board: (FigurePiece | null)[][]
+  ): string {
     if (!lastMove) return '-';
     const { piece, prevX, prevY, currX, currY } = lastMove;
 
-    if (piece instanceof Pawn && Math.abs(currX - prevX) === 2) {
+    const enemyPawnOne: FigurePiece | null = board[currX][currY - 1];
+    const enemyPawnTwo: FigurePiece | null = board[currX][currY + 1];
+
+    if (
+      piece instanceof Pawn &&
+      Math.abs(currX - prevX) === 2 &&
+      ((enemyPawnOne &&
+        enemyPawnOne instanceof Pawn &&
+        enemyPawnOne.color !== piece.color) ||
+        (enemyPawnTwo &&
+          enemyPawnTwo instanceof Pawn &&
+          enemyPawnTwo.color !== piece.color))
+    ) {
       const row: number = color === Color.White ? 6 : 3;
       return columns[prevY] + String(row);
     }

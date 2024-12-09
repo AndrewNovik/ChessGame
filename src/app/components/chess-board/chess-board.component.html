@@ -31,6 +31,10 @@
       <div
         *ngFor="let row of chessBoardFigures; let x = index"
         class="row w-100 board"
+        [ngClass]="{
+          'enabled': !isNewGame,
+          'disabled-events': isNewGame,
+        }"
       >
         <div
           *ngFor="let cell of row; let y = index"
@@ -104,6 +108,43 @@
         </span>
       </div>
 
+      <div
+        *ngIf="isNewGame"
+        class="start-game-modal position-absolute py-3 px-4"
+      >
+        <form *ngIf="form" [formGroup]="form" (ngSubmit)="startGame()">
+          <div class="d-flex flex-column justify-content-between">
+            <div class="d-flex align-items-center mb-3 justify-content-between">
+              <span class="me-4">Choose color white / black</span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  formControlName="side"
+                  (change)="chooseSide($event)"
+                />
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <div class="d-flex align-items-center justify-content-between">
+              <span class="me-2">Play with Friend / AI</span>
+
+              <label class="switch">
+                <input
+                  type="checkbox"
+                  formControlName="mode"
+                  (change)="chooseMode($event)"
+                />
+                <span class="slider round"></span>
+              </label>
+            </div>
+            <button type="submit" class="btn-flip-board mt-3">
+              Start Game
+            </button>
+          </div>
+        </form>
+      </div>
+
       <div *ngIf="isGameOver" class="game-over-modal position-absolute p-3">
         <span class="m-3">{{ gameOverMessage }}</span>
         <button (click)="restartGame()" class="btn-end-game">New Game</button>
@@ -111,13 +152,13 @@
     </div>
     <div class="side-bar col-md-4 d-flex justify-content-start flex-column">
       <div
-        [class.enabled]="recordedMoves.length"
-        class="game-menu d-flex justify-content-between"
+        [class.enabled]="!isNewGame"
+        class="disabled-events d-flex justify-content-between align-items-center"
       >
         <button (click)="restartGame()" class="btn-new-game">
           Restart Game
         </button>
-        <button (click)="flipBoard()" class="btn-flip-board">Flip board</button>
+        <span>{{ evalValue || 0 }}</span>
         <button (click)="surrenderGame()" class="btn-surrender-game">
           Surrender
         </button>
@@ -151,6 +192,17 @@
             [alt]="figureImageSource[move.promotedPiece]"
           />
         </div>
+      </div>
+
+      <div class="d-flex justify-content-between mt-2">
+        <button
+          (click)="getBestMove()"
+          class="disabled-events btn-new-game"
+          [class.enabled]="!isNewGame"
+        >
+          Get Best Move
+        </button>
+        <button (click)="flipBoard()" class="btn-flip-board">Flip board</button>
       </div>
 
       <div class="board-naviagation"></div>

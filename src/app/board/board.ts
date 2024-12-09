@@ -19,7 +19,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import { FENconvertor } from './FEN-converter';
 
 export class ChessBoard {
-  private _playerColor: Color = Color.White;
+  public _activePlayerColor: Color = Color.White;
+  public _computerMode: boolean = false;
   private readonly chessBoardSize: number = 8;
   // копирование стартовой позиции с экземплярами классов фигур в доску
   private chessBoard: (FigurePiece | null)[][] = cloneDeep(startBoardPosition);
@@ -48,8 +49,8 @@ export class ChessBoard {
     return this._safeCells;
   }
 
-  get playerColor(): Color {
-    return this._playerColor;
+  get activePlayerColor(): Color {
+    return this._activePlayerColor;
   }
 
   get checkingKing(): KingChecking {
@@ -202,7 +203,7 @@ export class ChessBoard {
 
         // если есть фигура цвета игрока
         if (startFigure) {
-          if (startFigure.color === this._playerColor) {
+          if (startFigure.color === this._activePlayerColor) {
             // нужно пройтись по его дирекшенам (у ладьи их 4 например)
             for (const { x: dx, y: dy } of startFigure.figureDirections) {
               // обьявляем новую координату для проверки исходя из дирекшена
@@ -321,9 +322,8 @@ export class ChessBoard {
 
     const allyFigure: FigurePiece | null = this.chessBoardFigures[prevX][prevY];
 
-    // перепроверка, если на выбранном поле не фигуры или она вражеская
-    if (!allyFigure || allyFigure.color !== this._playerColor) return;
-
+    // перепроверка, если на выбранном поле не фигуры
+    if (!allyFigure || allyFigure.color !== this._activePlayerColor) return;
     // выборка у нашей фигуры её доступных ходов
     const figureSafeMoves: Coordinate[] | undefined = this._safeCells.get(
       prevX + ',' + prevY
@@ -361,14 +361,14 @@ export class ChessBoard {
         figureCost = 3;
       if (takenFigure instanceof Pawn) figureCost = 1;
 
-      if (this.playerColor === Color.White) {
+      if (this._activePlayerColor === Color.White) {
         this._shotDownFigures.blackSideFigures.push(
           this.chessBoard[newX][newY]!.figure
         );
         // белым добавляем стоимость
         this._shotDownFigures.count += figureCost;
       }
-      if (this.playerColor === Color.Black) {
+      if (this._activePlayerColor === Color.Black) {
         this._shotDownFigures.whiteSideFigures.push(
           this.chessBoard[newX][newY]!.figure
         );
@@ -398,12 +398,12 @@ export class ChessBoard {
       this.chessBoard[this._lastMove.currX][this._lastMove.currY] = null;
 
       // считчик фигур
-      if (this.playerColor === Color.White) {
+      if (this._activePlayerColor === Color.White) {
         this._shotDownFigures.blackSideFigures.push(Figure.BlackPawn);
         // белым добавляем стоимость пешки
         this._shotDownFigures.count += 1;
       }
-      if (this.playerColor === Color.Black) {
+      if (this._activePlayerColor === Color.Black) {
         this._shotDownFigures.whiteSideFigures.push(Figure.WhitePawn);
         // черным отнимаем
         this._shotDownFigures.count -= 1;
@@ -445,23 +445,23 @@ export class ChessBoard {
     this.chessBoard[prevX][prevY] = null;
 
     // меняем активного игрока
-    this._playerColor =
-      this._playerColor === Color.White ? Color.Black : Color.White;
+    this._activePlayerColor =
+      this._activePlayerColor === Color.White ? Color.Black : Color.White;
 
     // обязательно считаем король под шахом или нет, т.к. ход сделан и если что, помечаем его
-    this.isInCheck(this._playerColor, true);
+    this.isInCheck(this._activePlayerColor, true);
 
     // пересчитываем доступные ходы
     this._safeCells = this.findSafeMoves();
 
     // счетчик полных ходов, когда походил и белые и черные
-    if (this._playerColor === Color.White) {
+    if (this._activePlayerColor === Color.White) {
       this.fullMovesCounter++;
     }
 
     this._boardAsFEN = this.FENconverter.convertBoardToFEN(
       this.chessBoard,
-      this._playerColor,
+      this._activePlayerColor,
       this._lastMove,
       this.fiftyMoveRuleCounter,
       this.fullMovesCounter
@@ -475,6 +475,8 @@ export class ChessBoard {
 
   private canCastle(king: King, kingShortSideCastle: boolean): boolean {
     if (king.hasMoved) return false;
+
+    if (this.checkingKing?.isInCheck) return false;
 
     // позиции фигур в зависимости от цвета короля
     const kingPositionX: number = king.color === Color.White ? 0 : 7;
@@ -549,7 +551,7 @@ export class ChessBoard {
     // или они не стоят рядом по оси игрик
     if (
       !(piece instanceof Pawn) ||
-      pawn.color !== this._playerColor ||
+      pawn.color !== this._activePlayerColor ||
       Math.abs(currX - prevX) !== 2 ||
       pawnX !== currX ||
       Math.abs(pawnY - currY) !== 1
@@ -583,19 +585,19 @@ export class ChessBoard {
       promotedFigureType === Figure.WhiteKnight ||
       promotedFigureType === Figure.BlackKnight
     )
-      return new Knight(this._playerColor);
+      return new Knight(this._activePlayerColor);
     if (
       promotedFigureType === Figure.WhiteBishop ||
       promotedFigureType === Figure.BlackBishop
     )
-      return new Bishop(this._playerColor);
+      return new Bishop(this._activePlayerColor);
     if (
       promotedFigureType === Figure.WhiteRook ||
       promotedFigureType === Figure.BlackRook
     )
-      return new Rook(this._playerColor);
+      return new Rook(this._activePlayerColor);
 
-    return new Queen(this._playerColor);
+    return new Queen(this._activePlayerColor);
   }
 
   private isGameFinished(): boolean {
@@ -610,7 +612,7 @@ export class ChessBoard {
       if (this._checkingKing.isInCheck) {
         // мат
         const prevPlayer: string =
-          this._playerColor === Color.White ? Color.Black : Color.White;
+          this._activePlayerColor === Color.White ? Color.Black : Color.White;
         this._gameOverMessage = prevPlayer + ' ' + 'won by checkmate';
       } else this._gameOverMessage = 'Stalemate'; // пат
 
@@ -724,7 +726,7 @@ export class ChessBoard {
     this._isGameOver = false;
     this._checkingKing.isInCheck = false;
     this._gameOverMessage = undefined;
-    this._playerColor = Color.White;
+    this._activePlayerColor = Color.White;
     this.chessBoard = cloneDeep(startBoardPosition);
     this._safeCells = this.findSafeMoves();
     this._shotDownFigures.blackSideFigures = [];
@@ -733,12 +735,16 @@ export class ChessBoard {
     this.fullMovesCounter = 1;
     this.threeFoldRepetitionDictionary.clear();
     this.threeFoldRepetition = false;
+    this._boardAsFEN =
+      'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
   }
 
   surrenderGame() {
     this._isGameOver = true;
     this._gameOverMessage =
-      this._playerColor === Color.White ? 'White gave up' : 'Black gave up';
+      this._activePlayerColor === Color.White
+        ? 'White gave up'
+        : 'Black gave up';
   }
 
   private updateThreeFoldRepetionDictionary(FEN: string): void {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ChessBoard } from '../../board/board';
 import {
   CellWithFigure,
@@ -18,21 +18,36 @@ import { isEquel } from '../../utils/helpers';
 import { FigurePiece } from '../../figures/figures';
 import { AbsPipe } from '../../utils/pipes/abs.pipe';
 import { YcoordinateConverterPipe } from '../../utils/pipes/y-coordinate-converter.pipe';
+import { ChessApiService } from '../../services/chess-api.service';
+import { Subject, takeUntil } from 'rxjs';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  UntypedFormGroup,
+  Validators,
+} from '@angular/forms';
 
 @Component({
   selector: 'app-chess-board',
   standalone: true,
-  imports: [CommonModule, AbsPipe, YcoordinateConverterPipe],
+  imports: [
+    CommonModule,
+    AbsPipe,
+    YcoordinateConverterPipe,
+    ReactiveFormsModule,
+  ],
   templateUrl: './chess-board.component.html',
   styleUrl: './chess-board.component.scss',
 })
-export class ChessBoardComponent {
+export class ChessBoardComponent implements OnInit, OnDestroy {
   private chessBoard: ChessBoard = new ChessBoard();
   private selectedCell: SelectedCell = { figure: null };
   private figureSafeCells: Coordinate[] = [];
   private promotionCoordinate: Coordinate | null = null;
   private promotedFigure: Figure | null = null;
   private checkState: KingChecking = this.chessBoard.checkingKing;
+  private destroy$ = new Subject();
+  form: UntypedFormGroup;
 
   figureImageSource = FigureImageSource;
   shotDownFigureImageSource = ShotDownFigureImageSource;
@@ -40,6 +55,9 @@ export class ChessBoardComponent {
   recordedMoves: LastMove[] = [];
   isPromotionActive: boolean = false;
   isBoardFlipped: boolean = false;
+  isSideChanged: boolean = false;
+  isNewGame: boolean = true;
+  evalValue: number = 0;
 
   get chessBoardFigures(): (FigurePiece | null)[][] {
     return this.chessBoard.chessBoardFigures;
@@ -57,8 +75,21 @@ export class ChessBoardComponent {
   }
 
   get playerColor(): Color {
-    return this.chessBoard.playerColor;
+    return this.chessBoard._activePlayerColor;
   }
+
+  set playerColor(color: Color) {
+    this.chessBoard._activePlayerColor = color;
+  }
+
+  get computerMode() {
+    return this.chessBoard._computerMode;
+  }
+
+  set computerMode(v: boolean) {
+    this.chessBoard._computerMode = v;
+  }
+
   get safeCells(): SafeMoves {
     return this.chessBoard.safeCells;
   }
@@ -69,7 +100,25 @@ export class ChessBoardComponent {
       : promotedFigureTypes.blaclList;
   }
 
-  constructor() {}
+  constructor(private chessApi: ChessApiService, private fb: FormBuilder) {
+    this.form = this.fb.group({
+      side: [false, Validators.required],
+      mode: [false, Validators.required],
+    });
+  }
+
+  ngOnInit() {}
+
+  getBestMove() {
+    this.chessApi
+      .getBestMove(this.chessBoard.boardAsFEN)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((res) => {
+        const { prevX, prevY, newX, newY, promotedPiece } = res.bestMove;
+        this.updateBoard(prevX, prevY, newX, newY, promotedPiece);
+        this.evalValue = Number(res.eval);
+      });
+  }
 
   isCellDark(x: number, y: number): boolean {
     return ChessBoard.isCellDark(x, y);
@@ -194,16 +243,33 @@ export class ChessBoardComponent {
       return;
     }
 
-    this.updateBoard(this.selectedCell.x!, this.selectedCell.y!, newX, newY);
+    this.updateBoard(
+      this.selectedCell.x!,
+      this.selectedCell.y!,
+      newX,
+      newY,
+      this.promotedFigure
+    );
+
+    const playerSide: Color = this.isSideChanged ? Color.Black : Color.White;
+
+    if (this.computerMode && playerSide !== this.playerColor) {
+      setTimeout(() => this.getBestMove(), 1000);
+    }
   }
 
-  updateBoard(prevX: number, prevY: number, newX: number, newY: number) {
-    this.chessBoard.moveFigure(prevX, prevY, newX, newY, this.promotedFigure);
+  updateBoard(
+    prevX: number,
+    prevY: number,
+    newX: number,
+    newY: number,
+    promotedFigure: Figure | null
+  ): void {
+    this.chessBoard.moveFigure(prevX, prevY, newX, newY, promotedFigure);
     this.checkState = this.chessBoard.checkingKing;
     // TO DO красивые иконки ходов
     this.recordedMoves.push(this.lastMove!);
     this.unmarkingSelectionAndSafeMoves();
-    this.flipBoard();
   }
 
   // отрабрабатывает по клику по фигуре в модалке превращения
@@ -215,7 +281,7 @@ export class ChessBoardComponent {
     const { x: newX, y: newY } = this.promotionCoordinate;
     const { x: prevX, y: prevY } = this.selectedCell;
     // перемещает пешку как бы, но из-за того что уже есть промоутед фигура, она передастся как параметр и совершится именно превращение. Обнуление модалки происходит дальше
-    this.updateBoard(prevX, prevY, newX, newY);
+    this.updateBoard(prevX, prevY, newX, newY, this.promotedFigure);
   }
 
   private unmarkingSelectionAndSafeMoves(): void {
@@ -235,22 +301,42 @@ export class ChessBoardComponent {
     this.unmarkingSelectionAndSafeMoves();
   }
 
-  restartGame() {
+  restartGame(): void {
     this.selectedCell = { figure: null };
     this.figureSafeCells = [];
     this.recordedMoves = [];
+    this.isNewGame = true;
     this.chessBoard.restartGame();
   }
 
-  surrenderGame() {
+  surrenderGame(): void {
     this.chessBoard.surrenderGame();
   }
 
-  flipBoard() {
+  flipBoard(): void {
     this.isBoardFlipped = !this.isBoardFlipped;
   }
 
-  // private isEnemyFigureSelected(figure: FigurePiece | null): boolean {
-  //   return figure?.color === this.playerColor ? false : true;
-  // }
+  chooseSide(event: Event): void {
+    const target: HTMLInputElement = event.target as HTMLInputElement;
+    this.isSideChanged = target.checked;
+    this.flipBoard();
+  }
+
+  chooseMode(event: Event): void {
+    const target: HTMLInputElement = event.target as HTMLInputElement;
+    this.computerMode = target.checked;
+  }
+
+  startGame() {
+    this.isNewGame = false;
+
+    if (this.isSideChanged && this.computerMode) {
+      this.getBestMove();
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.complete();
+  }
 }
