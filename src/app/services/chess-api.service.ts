@@ -26,7 +26,6 @@ export class ChessApiService {
   }
 
   private convertMoveFromChessApi(move: string): ChessApiMove {
-    console.log(move);
     const prevY: number = yToNum(move[0]);
     const prevX: number = Number(move[1]) - 1;
     const newY: number = yToNum(move[2]);
@@ -44,14 +43,9 @@ export class ChessApiService {
 
     return this.http.post<ChessApiResponce>(this.api, { ...params }).pipe(
       switchMap((responce: any) => {
-        const bestmove: ChessApiMove = this.convertMoveFromChessApi(
-          responce.bestMove
-        );
-        const evalValue: string = responce.eval;
-
         const endResponce: ChessApiResponce = {
-          bestMove: bestmove,
-          eval: evalValue,
+          bestMove: this.convertMoveFromChessApi(responce.bestMove),
+          eval: responce.eval,
         };
 
         return of(endResponce);

@@ -73,6 +73,15 @@
           />
         </div>
       </div>
+      <div class="eval-bar w-100">
+        <mat-progress-bar
+          class="example-margin"
+          mode="determinate"
+          [value]="50 + evalValue * 7"
+          [bufferValue]="50"
+        >
+        </mat-progress-bar>
+      </div>
       <div class="shot-down-area d-flex align-self-end justify-content-end">
         <div
           *ngFor="let figure of shotDownFigures?.whiteSideFigures"
@@ -196,7 +205,7 @@
 
       <div class="d-flex justify-content-between mt-2">
         <button
-          (click)="getBestMove()"
+          (click)="getBestMove(true)"
           class="disabled-events btn-new-game"
           [class.enabled]="!isNewGame"
         >

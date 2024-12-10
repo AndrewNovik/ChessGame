@@ -26,7 +26,7 @@ import {
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
-
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 @Component({
   selector: 'app-chess-board',
   standalone: true,
@@ -35,11 +35,12 @@ import {
     AbsPipe,
     YcoordinateConverterPipe,
     ReactiveFormsModule,
+    MatProgressBarModule,
   ],
   templateUrl: './chess-board.component.html',
   styleUrl: './chess-board.component.scss',
 })
-export class ChessBoardComponent implements OnInit, OnDestroy {
+export class ChessBoardComponent implements OnDestroy {
   private chessBoard: ChessBoard = new ChessBoard();
   private selectedCell: SelectedCell = { figure: null };
   private figureSafeCells: Coordinate[] = [];
@@ -107,16 +108,29 @@ export class ChessBoardComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit() {}
+  ngAfterInit() {}
 
-  getBestMove() {
+  getBestMove(forceGetBestMove: boolean = false) {
     this.chessApi
       .getBestMove(this.chessBoard.boardAsFEN)
       .pipe(takeUntil(this.destroy$))
       .subscribe((res) => {
-        const { prevX, prevY, newX, newY, promotedPiece } = res.bestMove;
-        this.updateBoard(prevX, prevY, newX, newY, promotedPiece);
+        const playerSide: Color = this.isSideChanged
+          ? Color.Black
+          : Color.White;
+
         this.evalValue = Number(res.eval);
+
+        if (
+          forceGetBestMove ||
+          (this.computerMode && playerSide !== this.playerColor)
+        ) {
+          const { prevX, prevY, newX, newY, promotedPiece } = res.bestMove;
+          setTimeout(
+            () => this.updateBoard(prevX, prevY, newX, newY, promotedPiece),
+            2000
+          );
+        }
       });
   }
 
@@ -250,12 +264,6 @@ export class ChessBoardComponent implements OnInit, OnDestroy {
       newY,
       this.promotedFigure
     );
-
-    const playerSide: Color = this.isSideChanged ? Color.Black : Color.White;
-
-    if (this.computerMode && playerSide !== this.playerColor) {
-      setTimeout(() => this.getBestMove(), 1000);
-    }
   }
 
   updateBoard(
@@ -270,6 +278,7 @@ export class ChessBoardComponent implements OnInit, OnDestroy {
     // TO DO красивые иконки ходов
     this.recordedMoves.push(this.lastMove!);
     this.unmarkingSelectionAndSafeMoves();
+    this.getBestMove();
   }
 
   // отрабрабатывает по клику по фигуре в модалке превращения
