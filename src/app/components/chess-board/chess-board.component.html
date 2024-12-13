@@ -1,5 +1,5 @@
 <div
-  *ngIf="chessBoardFigures"
+  *ngIf="chessBoard$ | async as chessBoardFigures"
   class="container align-items-center justify-content-center"
 >
   <div class="row">
@@ -180,6 +180,10 @@
         <div
           *ngFor="let move of recordedMoves; let index = index"
           class="recorded-move d-flex align-items-center"
+          (click)="showMove(index + 1)"
+          [ngClass]="{
+            'current-move': index + 1 === showMoveIndex
+          }"
         >
           <span *ngIf="index % 2 == 0" class="px-2 full-move-index">{{
             index / 2 + 1
@@ -203,6 +207,41 @@
         </div>
       </div>
 
+      <div class="board-naviagation d-flex justify-content-between mt-2">
+        <button
+          class="nav-button me-2 my-2 px-4 py-2"
+          (click)="showMove(0)"
+          [class.disabled-events]="movesCounter === 0 || showMoveIndex === 0"
+        >
+          <i class="bi bi-skip-backward-fill"></i>
+        </button>
+        <button
+          class="nav-button m-2 px-4 py-2"
+          (click)="showMove(showMoveIndex - 1)"
+          [class.disabled-events]="movesCounter === 0 || showMoveIndex === 0"
+        >
+          <i class="bi bi-skip-start-fill"></i>
+        </button>
+        <button
+          class="nav-button m-2 px-4 py-2"
+          (click)="showMove(showMoveIndex + 1)"
+          [class.disabled-events]="
+            movesCounter === 0 || showMoveIndex === movesCounter
+          "
+        >
+          <i class="bi bi-skip-end-fill"></i>
+        </button>
+        <button
+          class="nav-button ms-2 my-2 px-4 py-2"
+          (click)="showMove(-1)"
+          [class.disabled-events]="
+            movesCounter === 0 || showMoveIndex === movesCounter
+          "
+        >
+          <i class="bi bi-skip-forward-fill"></i>
+        </button>
+      </div>
+
       <div class="d-flex justify-content-between mt-2">
         <button
           (click)="getBestMove(true)"
@@ -213,8 +252,6 @@
         </button>
         <button (click)="flipBoard()" class="btn-flip-board">Flip board</button>
       </div>
-
-      <div class="board-naviagation"></div>
     </div>
   </div>
 </div>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { ChessBoard } from '../../board/board';
 import {
   CellWithFigure,
@@ -60,6 +60,8 @@ export class ChessBoardComponent implements OnDestroy {
   isNewGame: boolean = true;
   evalValue: number = 0;
 
+  chessBoard$ = this.chessBoard.chessBoardSubject$;
+
   get chessBoardFigures(): (FigurePiece | null)[][] {
     return this.chessBoard.chessBoardFigures;
   }
@@ -95,6 +97,18 @@ export class ChessBoardComponent implements OnDestroy {
     return this.chessBoard.safeCells;
   }
 
+  get chessBoardAsFEN(): string {
+    return this.chessBoard.boardAsFEN;
+  }
+
+  get showMoveIndex(): number {
+    return this.chessBoard.showMoveIndex;
+  }
+
+  get movesCounter(): number {
+    return this.chessBoard.movesCounter;
+  }
+
   availablePromotionFigureTypes(): Figure[] {
     return this.playerColor === Color.White
       ? promotedFigureTypes.whiteList
@@ -107,8 +121,6 @@ export class ChessBoardComponent implements OnDestroy {
       mode: [false, Validators.required],
     });
   }
-
-  ngAfterInit() {}
 
   getBestMove(forceGetBestMove: boolean = false) {
     this.chessApi
@@ -128,7 +140,7 @@ export class ChessBoardComponent implements OnDestroy {
           const { prevX, prevY, newX, newY, promotedPiece } = res.bestMove;
           setTimeout(
             () => this.updateBoard(prevX, prevY, newX, newY, promotedPiece),
-            2000
+            1000
           );
         }
       });
@@ -275,7 +287,6 @@ export class ChessBoardComponent implements OnDestroy {
   ): void {
     this.chessBoard.moveFigure(prevX, prevY, newX, newY, promotedFigure);
     this.checkState = this.chessBoard.checkingKing;
-    // TO DO красивые иконки ходов
     this.recordedMoves.push(this.lastMove!);
     this.unmarkingSelectionAndSafeMoves();
     this.getBestMove();
@@ -344,6 +355,10 @@ export class ChessBoardComponent implements OnDestroy {
     if (this.isSideChanged && this.computerMode) {
       this.getBestMove();
     }
+  }
+
+  showMove(move: number): void {
+    this.chessBoard.showMoveFromChessBoardHistory(move);
   }
 
   ngOnDestroy() {

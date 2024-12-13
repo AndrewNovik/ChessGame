@@ -32,7 +32,7 @@ export function yToNum(l: string): number {
       break;
   }
   if (result === null) {
-    console.log('problem with responce');
+    console.log('problem with responce or end game');
     return 0;
   }
   return result;

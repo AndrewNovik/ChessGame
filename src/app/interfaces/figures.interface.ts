@@ -75,6 +75,15 @@ export const ShotDownFigureImageSource: Readonly<Record<Figure, string>> = {
   [Figure.BlackKing]: 'assets/images/png/bw/bks.png',
 };
 
+export enum MoveType {
+  Capture,
+  Castling,
+  Promotion,
+  Check,
+  CheckMate,
+  BasicMove,
+}
+
 export const promotedFigureTypes = {
   whiteList: [
     Figure.WhiteKnight,
@@ -99,6 +108,7 @@ export type LastMove = {
   currX: number;
   currY: number;
   promotedPiece?: Figure;
+  type?: MoveType;
 };
 
 type KingChecked = {

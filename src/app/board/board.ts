@@ -11,19 +11,31 @@ import {
   Figure,
   KingChecking,
   LastMove,
+  MoveType,
   SafeMoves,
   ShotDownFigures,
 } from '../interfaces/figures.interface';
 import { emptyShotDownFiguresList, startBoardPosition } from './board.const';
 import cloneDeep from 'lodash/cloneDeep';
 import { FENconvertor } from './FEN-converter';
+import { BehaviorSubject } from 'rxjs';
 
 export class ChessBoard {
   public _activePlayerColor: Color = Color.White;
   public _computerMode: boolean = false;
+  public showMoveIndex: number = 0;
+  public chessBoardHistory: (FigurePiece | null)[][][] = [
+    cloneDeep(startBoardPosition),
+  ];
   private readonly chessBoardSize: number = 8;
   // копирование стартовой позиции с экземплярами классов фигур в доску
   private chessBoard: (FigurePiece | null)[][] = cloneDeep(startBoardPosition);
+
+  private chessBoardSubject: BehaviorSubject<(FigurePiece | null)[][]> =
+    new BehaviorSubject<(FigurePiece | null)[][]>(
+      cloneDeep(startBoardPosition)
+    );
+  public chessBoardSubject$ = this.chessBoardSubject.asObservable();
 
   private _safeCells: SafeMoves = this.findSafeMoves(); // Map<string, Coordinate[]>
   private _checkingKing: KingChecking = { isInCheck: false }; // {isInCheck: boolean; x: number; y: number;} default start king is no checked
@@ -33,6 +45,7 @@ export class ChessBoard {
   private _gameOverMessage: string | undefined;
   private fiftyMoveRuleCounter: number = 0;
   private fullMovesCounter: number = 1;
+  private _movesCounter: number = 0;
   private _shotDownFigures: ShotDownFigures = emptyShotDownFiguresList;
   private FENconverter: FENconvertor = new FENconvertor();
   private _boardAsFEN: string =
@@ -67,6 +80,10 @@ export class ChessBoard {
 
   get gameOverMessage(): string | undefined {
     return this._gameOverMessage;
+  }
+
+  get movesCounter(): number {
+    return this._movesCounter;
   }
 
   // доска в формате массивов из обьектов фигур, null и тд.
@@ -375,6 +392,7 @@ export class ChessBoard {
         // черным отнимаем
         this._shotDownFigures.count -= figureCost;
       }
+      this.playSound(MoveType.Capture);
     }
 
     if (allyFigure instanceof Pawn || isFigureTaken) {
@@ -408,6 +426,7 @@ export class ChessBoard {
         // черным отнимаем
         this._shotDownFigures.count -= 1;
       }
+      this.playSound(MoveType.Capture);
     }
 
     if (
@@ -430,6 +449,7 @@ export class ChessBoard {
         currY: newY,
         promotedPiece: this.chessBoard[newX][newY]!.figure,
       };
+      this.playSound(MoveType.Promotion);
     } else {
       this.chessBoard[newX][newY] = allyFigure;
       // запись прошлого хода
@@ -440,6 +460,7 @@ export class ChessBoard {
         currX: newX,
         currY: newY,
       };
+      this.playSound(MoveType.BasicMove);
     }
 
     this.chessBoard[prevX][prevY] = null;
@@ -449,7 +470,9 @@ export class ChessBoard {
       this._activePlayerColor === Color.White ? Color.Black : Color.White;
 
     // обязательно считаем король под шахом или нет, т.к. ход сделан и если что, помечаем его
-    this.isInCheck(this._activePlayerColor, true);
+    if (this.isInCheck(this._activePlayerColor, true)) {
+      this.playSound(MoveType.Check);
+    }
 
     // пересчитываем доступные ходы
     this._safeCells = this.findSafeMoves();
@@ -467,6 +490,10 @@ export class ChessBoard {
       this.fullMovesCounter
     );
 
+    this.chessBoardHistory.push(cloneDeep(this.chessBoard));
+    this._movesCounter++;
+    this.showMoveIndex = this._movesCounter;
+    this.chessBoardSubject.next(this.chessBoard);
     this.updateThreeFoldRepetionDictionary(this._boardAsFEN);
 
     // проверяем не закончилась ли игра
@@ -539,6 +566,7 @@ export class ChessBoard {
       this.chessBoard[rookPositionX][rookPositionY] = null;
       this.chessBoard[rookPositionX][rookNewPositionY] = rook;
       rook.hasMoved = true;
+      this.playSound(MoveType.Castling);
     }
   }
 
@@ -604,6 +632,7 @@ export class ChessBoard {
     // теоритически ничейные позиции при отстутствии материал для мата
     if (this.insufficientMaterial()) {
       this._gameOverMessage = 'Draw due to lack of material';
+      this.playSound(MoveType.CheckMate);
       return true;
     }
 
@@ -614,19 +643,22 @@ export class ChessBoard {
         const prevPlayer: string =
           this._activePlayerColor === Color.White ? Color.Black : Color.White;
         this._gameOverMessage = prevPlayer + ' ' + 'won by checkmate';
+        this.playSound(MoveType.CheckMate);
       } else this._gameOverMessage = 'Stalemate'; // пат
-
+      this.playSound(MoveType.CheckMate);
       return true;
     }
 
     if (this.threeFoldRepetition) {
       this._gameOverMessage = 'Draw due three fold repetition rule';
+      this.playSound(MoveType.CheckMate);
       return true;
     }
 
     // правило 50 ходов
     if (this.fiftyMoveRuleCounter === 50) {
       this._gameOverMessage = 'Draw due fifty move rule';
+      this.playSound(MoveType.CheckMate);
       return true;
     }
 
@@ -737,6 +769,9 @@ export class ChessBoard {
     this.threeFoldRepetition = false;
     this._boardAsFEN =
       'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    this.chessBoardHistory = [];
+    this._movesCounter = 0;
+    this.chessBoardSubject.next(cloneDeep(startBoardPosition));
   }
 
   surrenderGame() {
@@ -769,5 +804,38 @@ export class ChessBoard {
       // а если там единичка, то значит такая позиция уже есть и началось повторение
       this.threeFoldRepetitionDictionary.set(threeFoldRepetitionFENkey, 2);
     }
+  }
+
+  playSound(moveType: MoveType): void {
+    const moveSound = new Audio('../assets/sound/move.mp3');
+
+    if (moveType === MoveType.Promotion) {
+      moveSound.src = 'assets/sound/promote.mp3';
+    } else if (moveType === MoveType.Capture) {
+      moveSound.src = 'assets/sound/capture.mp3';
+    } else if (moveType === MoveType.Castling) {
+      moveSound.src = 'assets/sound/castling.mp3';
+    }
+
+    if (moveType === MoveType.CheckMate) {
+      moveSound.src = 'assets/sound/checkmate.mp3';
+    } else if (moveType === MoveType.Check) {
+      moveSound.src = 'assets/sound/check.mp3';
+    }
+
+    moveSound.play();
+  }
+
+  showMoveFromChessBoardHistory(move: number) {
+    if (move === -1) {
+      this.chessBoardSubject.next(
+        this.chessBoardHistory[this.chessBoardHistory.length - 1]
+      );
+      this.showMoveIndex = this.chessBoardHistory.length - 1;
+      return;
+    }
+
+    this.chessBoardSubject.next(this.chessBoardHistory[move]);
+    this.showMoveIndex = move;
   }
 }

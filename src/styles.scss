@@ -40,7 +40,7 @@ $chess-theme: mat.define-light-theme(
 
 /* Importing Bootstrap SCSS file. */
 @import "bootstrap/scss/bootstrap";
-
+@import "bootstrap-icons/font/bootstrap-icons.css";
 html,
 body {
   height: 100%;
