@@ -207,7 +207,10 @@
         </div>
       </div>
 
-      <div class="board-naviagation d-flex justify-content-between mt-2">
+      <div
+        class="board-naviagation d-flex justify-content-between mt-2"
+        [class.disabled-events]="loadingMoves"
+      >
         <button
           class="nav-button me-2 my-2 px-4 py-2"
           (click)="showMove(0)"

@@ -19,7 +19,7 @@ import { FigurePiece } from '../../figures/figures';
 import { AbsPipe } from '../../utils/pipes/abs.pipe';
 import { YcoordinateConverterPipe } from '../../utils/pipes/y-coordinate-converter.pipe';
 import { ChessApiService } from '../../services/chess-api.service';
-import { Subject, takeUntil } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -59,6 +59,7 @@ export class ChessBoardComponent implements OnDestroy {
   isSideChanged: boolean = false;
   isNewGame: boolean = true;
   evalValue: number = 0;
+  loadingMoves: boolean = false;
 
   chessBoard$ = this.chessBoard.chessBoardSubject$;
 
@@ -123,9 +124,13 @@ export class ChessBoardComponent implements OnDestroy {
   }
 
   getBestMove(forceGetBestMove: boolean = false) {
+    this.loadingMoves = true;
     this.chessApi
       .getBestMove(this.chessBoard.boardAsFEN)
-      .pipe(takeUntil(this.destroy$))
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => (this.loadingMoves = false))
+      )
       .subscribe((res) => {
         const playerSide: Color = this.isSideChanged
           ? Color.Black
@@ -289,7 +294,9 @@ export class ChessBoardComponent implements OnDestroy {
     this.checkState = this.chessBoard.checkingKing;
     this.recordedMoves.push(this.lastMove!);
     this.unmarkingSelectionAndSafeMoves();
-    this.getBestMove();
+    if (!this.isGameOver) {
+      this.getBestMove();
+    }
   }
 
   // отрабрабатывает по клику по фигуре в модалке превращения
@@ -358,6 +365,7 @@ export class ChessBoardComponent implements OnDestroy {
   }
 
   showMove(move: number): void {
+    console.log(move);
     this.chessBoard.showMoveFromChessBoardHistory(move);
   }
 
