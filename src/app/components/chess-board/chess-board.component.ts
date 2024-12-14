@@ -365,7 +365,6 @@ export class ChessBoardComponent implements OnDestroy {
   }
 
   showMove(move: number): void {
-    console.log(move);
     this.chessBoard.showMoveFromChessBoardHistory(move);
   }
 
